@@ -1,0 +1,27 @@
+title:
+  interval: 1
+  list:
+    - "&8&m=====&a&l Server &8&m====="
+    - "&8&m=====&b&l Server &8&m====="
+    - "&8&m=====&c&l Server &8&m====="
+    - "&8&m=====&d&l Server &8&m====="
+    - "&8&m=====&e&l Server &8&m====="
+    - "&8&m=====&f&l Server &8&m====="
+
+line:
+  empty-1:
+    interval: 0
+    list:
+      - ""
+  player-count:
+    interval: 5
+    list:
+      - " &7Login: &b%server_online%/%server_max_players% players"
+  player-ping:
+    interval: 20
+    list:
+      - " &7Ping: &b%player_ping%ms"
+  empty-2:
+    interval: 0
+    list:
+      - ""

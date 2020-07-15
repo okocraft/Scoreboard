@@ -25,6 +25,10 @@ public class Line {
         }
     }
 
+    public long getInterval() {
+        return interval;
+    }
+
     public void update() {
         if (interval <= count) {
             count = 0;

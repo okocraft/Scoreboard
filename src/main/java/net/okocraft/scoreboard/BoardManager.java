@@ -73,6 +73,11 @@ public class BoardManager {
     }
 
     @NotNull
+    public Board getDefault() {
+        return boards.get("default");
+    }
+
+    @NotNull
     @Unmodifiable
     private Map<String, Board> loadBoards() throws IOException {
         Board defBoard = loadBoard(new BukkitConfig(plugin, "default.yml", true));

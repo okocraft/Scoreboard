@@ -1,5 +1,6 @@
 package net.okocraft.scoreboard;
 
+import net.okocraft.scoreboard.board.Line;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
 import org.bukkit.ChatColor;
@@ -53,7 +54,10 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         getServer().getScheduler().runTaskLater(this, this::checkPlaceholderAPI, 1);
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, boardManager::update, 1, 1);
+        long lowest =
+                boardManager.getDefault().getLines().stream().map(Line::getInterval).sorted().findFirst().orElse(0L);
+
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, boardManager::update, lowest, lowest);
     }
 
     @NotNull

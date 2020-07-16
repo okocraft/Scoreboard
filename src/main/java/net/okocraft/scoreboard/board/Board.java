@@ -14,9 +14,16 @@ public class Board {
         this.lines = lines;
     }
 
-    public void update() {
-        title.update();
-        lines.forEach(Line::update);
+    public void update(long increment) {
+        if (title.shouldUpdate()) {
+            title.update(increment);
+        }
+
+        for (Line line : lines) {
+            if (line.shouldUpdate()) {
+                line.update(increment);
+            }
+        }
     }
 
     @NotNull

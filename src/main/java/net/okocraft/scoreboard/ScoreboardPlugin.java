@@ -1,14 +1,11 @@
 package net.okocraft.scoreboard;
 
-import net.okocraft.scoreboard.board.Line;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 
 public class ScoreboardPlugin extends JavaPlugin {
 
@@ -40,7 +37,7 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         try {
             boardManager = new BoardManager(this);
-        } catch (IOException e) {
+        } catch (IllegalStateException e) {
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -53,11 +50,6 @@ public class ScoreboardPlugin extends JavaPlugin {
         listener.register();
 
         getServer().getScheduler().runTaskLater(this, this::checkPlaceholderAPI, 1);
-
-        long lowest =
-                boardManager.getDefault().getLines().stream().map(Line::getInterval).sorted().findFirst().orElse(0L);
-
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, boardManager::update, lowest, lowest);
     }
 
     @NotNull

@@ -6,7 +6,7 @@
 
     <groupId>net.okocraft.scoreboard</groupId>
     <artifactId>scoreboard</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <name>Scoreboard</name>
     <url>https://github.com/okocraft/Scoreboard</url>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <version>1.16.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -50,6 +50,12 @@
             <groupId>com.github.siroshun09.configapi</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.siroshun09.textlibs</groupId>
+            <artifactId>textlibs</artifactId>
+            <version>2.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

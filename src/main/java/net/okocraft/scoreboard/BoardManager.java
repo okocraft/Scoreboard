@@ -9,27 +9,34 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BoardManager {
 
     private final ScoreboardPlugin plugin;
-    private final Map<String, Board> boards;
+    private final Board defBoard;
     private final Set<BoardDisplay> displayedBoards;
+    private final long updateInterval;
 
-    BoardManager(@NotNull ScoreboardPlugin plugin) throws IOException {
+    BoardManager(@NotNull ScoreboardPlugin plugin) {
         this.plugin = plugin;
         this.displayedBoards = new HashSet<>();
-        boards = loadBoards();
+        defBoard = loadBoard(new BukkitConfig(plugin, "default.yml", true));
+
+        if (defBoard == null) {
+            throw new IllegalStateException("Could not load default board");
+        }
+
+        updateInterval =
+                defBoard.getLines().stream().map(Line::getInterval).sorted().findFirst().orElse(1L);
+
+        plugin.getServer().getScheduler()
+                .scheduleSyncRepeatingTask(plugin, this::update, updateInterval, updateInterval);
     }
 
     public void showAllDefault() {
@@ -37,17 +44,7 @@ public class BoardManager {
     }
 
     public void showDefault(@NotNull Player player) {
-        showBoard(player, "default");
-    }
-
-    public void showBoard(@NotNull Player player, @NotNull String boardName) {
-        Board board = boards.get(boardName);
-
-        if (board == null) {
-            return;
-        }
-
-        displayedBoards.add(new BoardDisplay(plugin, board, player));
+        displayedBoards.add(new BoardDisplay(plugin, defBoard, player));
     }
 
     public void removeBoard(@NotNull Player player) {
@@ -68,61 +65,8 @@ public class BoardManager {
     }
 
     public void update() {
-        boards.values().forEach(Board::update);
+        defBoard.update(updateInterval);
         displayedBoards.forEach(BoardDisplay::update);
-    }
-
-    @NotNull
-    public Board getDefault() {
-        return boards.get("default");
-    }
-
-    @NotNull
-    @Unmodifiable
-    private Map<String, Board> loadBoards() throws IOException {
-        Board defBoard = loadBoard(new BukkitConfig(plugin, "default.yml", true));
-
-        if (defBoard != null) {
-            return Map.of("default", defBoard);
-        } else {
-            return Collections.emptyMap();
-        }
-        /*
-
-        Path dirPath = plugin.getDataFolder().toPath().resolve("boards");
-
-        if (!Files.exists(dirPath)) {
-            if (defBoard != null) {
-                return Map.of("default", defBoard);
-            } else {
-                return Collections.emptyMap();
-            }
-        }
-
-        Set<Path> boardFiles =
-                Files.list(plugin.getDataFolder().toPath().resolve("boards"))
-                        .filter(Files::isRegularFile)
-                        .filter(Files::isReadable)
-                        .filter(p -> p.toString().endsWith(".yml"))
-                        .collect(Collectors.toUnmodifiableSet());
-
-        Map<String, Board> result = new HashMap<>();
-
-        result.put("default", defBoard);
-
-        for (Path file : boardFiles) {
-            Board board = loadBoard(new BukkitYaml(file));
-
-            if (board == null) {
-                continue;
-            }
-
-            String name = file.getFileName().toString().replace(".yml", "");
-            result.put(name, board);
-        }
-
-        return Map.copyOf(result);
-         */
     }
 
     @Nullable

@@ -33,7 +33,7 @@ public class BoardManager {
         }
 
         updateInterval =
-                defBoard.getLines().stream().map(Line::getInterval).sorted().findFirst().orElse(1L);
+                defBoard.getLines().stream().map(Line::getInterval).filter(i -> 0 < i).sorted().findFirst().orElse(1L);
 
         plugin.getServer().getScheduler()
                 .scheduleSyncRepeatingTask(plugin, this::update, updateInterval, updateInterval);

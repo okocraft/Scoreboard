@@ -19,11 +19,7 @@ public class Board {
             title.update(increment);
         }
 
-        for (Line line : lines) {
-            if (line.shouldUpdate()) {
-                line.update(increment);
-            }
-        }
+        lines.stream().filter(Line::shouldUpdate).forEach(l -> l.update(increment));
     }
 
     @NotNull

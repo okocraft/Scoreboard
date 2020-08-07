@@ -60,43 +60,39 @@ public class BoardDisplay {
         updateLines();
     }
 
-    public void updateTitle() {
-        String newTitle = PlaceholderAPIHooker.run(player, board.getTitle().getCurrentLine());
+    private void updateTitle() {
+        if (board.getTitle().shouldUpdate()) {
+            String newTitle = PlaceholderAPIHooker.run(player, board.getTitle().getCurrentLine());
 
-        if (!currentTitle.equals(newTitle)) {
-            currentTitle = newTitle;
-            objective.setDisplayName(plugin.checkLength(newTitle));
+            if (!currentTitle.equals(newTitle)) {
+                currentTitle = newTitle;
+                objective.setDisplayName(plugin.checkLength(newTitle));
+            }
         }
     }
 
-    public void updateLines() {
+    private void updateLines() {
         for (int i = 0, l = board.getLines().size(); i < l; i++) {
-            updateLine(i);
+            Line line = board.getLines().get(i);
+
+            if (!line.shouldUpdate()) {
+                return;
+            }
+
+            String str = PlaceholderAPIHooker.run(player, line.getCurrentLine());
+
+            if (currentLines.getOrDefault(i, "").equals(str)) {
+                return;
+            }
+
+            currentLines.put(i, str);
+
+            Team team = scoreboard.getTeam(String.valueOf(i));
+
+            if (team != null) {
+                team.setPrefix(plugin.checkLength(str));
+                team.setSuffix(ChatColor.RESET.toString());
+            }
         }
-    }
-
-    private void updateLine(int num) {
-        if (board.getLines().size() <= num) {
-            return;
-        }
-
-        Team team = scoreboard.getTeam(String.valueOf(num));
-
-        if (team == null) {
-            return;
-        }
-
-        Line line = board.getLines().get(num);
-
-        String str = PlaceholderAPIHooker.run(player, line.getCurrentLine());
-
-        if (currentLines.getOrDefault(num, "").equals(str)) {
-            return;
-        }
-
-        currentLines.put(num, str);
-
-        team.setPrefix(plugin.checkLength(str));
-        team.setSuffix(ChatColor.RESET.toString());
     }
 }

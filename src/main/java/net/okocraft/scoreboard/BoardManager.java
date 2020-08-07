@@ -48,8 +48,11 @@ public class BoardManager {
     }
 
     public void removeBoard(@NotNull Player player) {
-        Set<BoardDisplay> displayed = displayedBoards.stream().filter(b -> b.getPlayer().equals(player)).collect(Collectors.toSet());
-        displayed.forEach(displayedBoards::remove);
+        displayedBoards.stream()
+                .filter(b -> b.getPlayer().equals(player))
+                .collect(Collectors.toSet())
+                .forEach(displayedBoards::remove);
+
         player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());
     }
 

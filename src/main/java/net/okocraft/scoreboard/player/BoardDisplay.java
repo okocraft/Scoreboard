@@ -27,12 +27,14 @@ public class BoardDisplay {
 
     private final Map<Integer, String> currentLines;
 
-    private String currentTitle = "...";
+    private String currentTitle;
 
     public BoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
         this.plugin = plugin;
         this.board = board;
         this.player = player;
+
+        currentTitle = PlaceholderAPIHooker.run(player, board.getTitle().getCurrentLine());
 
         scoreboard = plugin.getScoreboardManager().getNewScoreboard();
         objective = scoreboard.registerNewObjective("sb", "sb", currentTitle, RenderType.INTEGER);
@@ -43,7 +45,12 @@ public class BoardDisplay {
 
         for (int i = 0, l = board.getLines().size(), c = ChatColor.values().length; i < l && i < c; i++) {
             String name = ChatColor.values()[i] + "";
-            scoreboard.registerNewTeam(String.valueOf(i)).addEntry(name);
+            Team team = scoreboard.registerNewTeam(String.valueOf(i));
+            team.addEntry(name);
+
+            String str = PlaceholderAPIHooker.run(player, board.getLines().get(i).getCurrentLine());
+            team.setPrefix(plugin.checkLength(str));
+            team.setSuffix(ChatColor.RESET.toString());
             objective.getScore(name).setScore(l - i);
         }
 
@@ -76,13 +83,13 @@ public class BoardDisplay {
             Line line = board.getLines().get(i);
 
             if (!line.shouldUpdate()) {
-                return;
+                continue;
             }
 
             String str = PlaceholderAPIHooker.run(player, line.getCurrentLine());
 
             if (currentLines.getOrDefault(i, "").equals(str)) {
-                return;
+                continue;
             }
 
             currentLines.put(i, str);

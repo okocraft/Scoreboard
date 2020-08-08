@@ -43,13 +43,12 @@ public class ScoreboardPlugin extends JavaPlugin {
             return;
         }
 
-        boardManager.showAllDefault();
-
         listener = new PlayerListener(this);
 
         listener.register();
 
         getServer().getScheduler().runTaskLater(this, this::checkPlaceholderAPI, 1);
+        getServer().getScheduler().runTaskLater(this, boardManager::showAllDefault, 2);
     }
 
     @NotNull

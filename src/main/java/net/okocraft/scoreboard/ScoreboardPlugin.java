@@ -7,28 +7,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ScoreboardPlugin extends JavaPlugin {
 
     private ScoreboardManager scoreboardManager;
     private BoardManager boardManager;
     private PlayerListener listener;
-
-    @Override
-    public void onDisable() {
-        if (boardManager != null) {
-            boardManager.removeAll();
-            boardManager = null;
-        }
-
-        if (listener != null) {
-            listener.unregister();
-            listener = null;
-        }
-
-        if (scoreboardManager != null) {
-            scoreboardManager = null;
-        }
-    }
+    private ExecutorService executor;
 
     @Override
     public void onEnable() {
@@ -45,10 +32,27 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         listener = new PlayerListener(this);
 
+        executor = Executors.newCachedThreadPool();
+
         listener.register();
 
         getServer().getScheduler().runTaskLater(this, this::checkPlaceholderAPI, 1);
         getServer().getScheduler().runTaskLater(this, boardManager::showAllDefault, 2);
+    }
+
+    @Override
+    public void onDisable() {
+        if (boardManager != null) {
+            boardManager.removeAll();
+        }
+
+        if (listener != null) {
+            listener.unregister();
+        }
+
+        if (executor != null) {
+            executor.shutdownNow();
+        }
     }
 
     @NotNull
@@ -114,5 +118,9 @@ public class ScoreboardPlugin extends JavaPlugin {
         } else {
             return str;
         }
+    }
+
+    public void runAsync(@NotNull Runnable task) {
+        executor.submit(task);
     }
 }

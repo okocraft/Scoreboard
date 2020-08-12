@@ -4,12 +4,12 @@ import com.github.siroshun09.configapi.bukkit.BukkitConfig;
 import com.github.siroshun09.configapi.bukkit.BukkitYaml;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.board.Line;
-import net.okocraft.scoreboard.player.BoardDisplay;
+import net.okocraft.scoreboard.player.DisplayedBoard;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,23 +20,24 @@ public class BoardManager {
 
     private final ScoreboardPlugin plugin;
     private final Board defBoard;
-    private final Set<BoardDisplay> displayedBoards;
-    private final long updateInterval;
+    private final Set<DisplayedBoard> displayedBoards;
+    private final long interval;
 
     BoardManager(@NotNull ScoreboardPlugin plugin) {
         this.plugin = plugin;
         this.displayedBoards = new HashSet<>();
+
         defBoard = loadBoard(new BukkitConfig(plugin, "default.yml", true));
 
-        if (defBoard == null) {
-            throw new IllegalStateException("Could not load default board");
-        }
+        long minInterval = defBoard.getLines().stream()
+                .map(Line::getInterval)
+                .filter(i -> 0 < i).sorted()
+                .findFirst()
+                .orElse(1L);
 
-        updateInterval =
-                defBoard.getLines().stream().map(Line::getInterval).filter(i -> 0 < i).sorted().findFirst().orElse(1L);
+        interval = Math.min(minInterval, defBoard.getTitle().getInterval());
 
-        plugin.getServer().getScheduler()
-                .scheduleSyncRepeatingTask(plugin, this::update, updateInterval, updateInterval);
+        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this::update, interval, interval);
     }
 
     public void showAllDefault() {
@@ -44,7 +45,7 @@ public class BoardManager {
     }
 
     public void showDefault(@NotNull Player player) {
-        displayedBoards.add(new BoardDisplay(plugin, defBoard, player));
+        displayedBoards.add(new DisplayedBoard(plugin, defBoard, player));
     }
 
     public void removeBoard(@NotNull Player player) {
@@ -57,7 +58,7 @@ public class BoardManager {
     }
 
     public void removeAll() {
-        for (BoardDisplay displayed : displayedBoards) {
+        for (DisplayedBoard displayed : displayedBoards) {
             Player player = displayed.getPlayer();
             if (player.isOnline()) {
                 player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());
@@ -68,37 +69,43 @@ public class BoardManager {
     }
 
     public void update() {
-        defBoard.update(updateInterval);
-        displayedBoards.forEach(BoardDisplay::update);
+        if (!plugin.getServer().getOnlinePlayers().isEmpty()) {
+            defBoard.update(interval);
+            displayedBoards.forEach(DisplayedBoard::update);
+        }
     }
 
-    @Nullable
+    @NotNull
     private Board loadBoard(@NotNull BukkitYaml yaml) {
         if (!yaml.load()) {
-            return null;
+            throw new IllegalStateException("Could not load default board");
         }
 
         List<String> titleList = yaml.getStringList("title.list");
 
         if (titleList.isEmpty()) {
-            return null;
+            titleList = List.of("");
         }
 
-        Line title = new Line(titleList, yaml.getLong("title.interval", 5));
+        Line title = new Line(titleList, yaml.getLong("title.interval", 0));
 
         ConfigurationSection section = yaml.getConfig().getConfigurationSection("line");
+
+        List<Line> lines;
+
         if (section == null) {
-            return null;
-        }
+            lines = Collections.emptyList();
+        } else {
+            lines = new LinkedList<>();
 
-        List<Line> lines = new LinkedList<>();
-        for (String root : section.getKeys(false)) {
-            List<String> lineList = section.getStringList(root + ".list");
+            for (String root : section.getKeys(false)) {
+                List<String> lineList = section.getStringList(root + ".list");
 
-            if (!lineList.isEmpty()) {
-                lines.add(new Line(lineList, section.getLong(root + ".interval")));
-            } else {
-                lines.add(Line.EMPTY);
+                if (lineList.isEmpty()) {
+                    lines.add(Line.EMPTY);
+                } else {
+                    lines.add(new Line(lineList, section.getLong(root + ".interval")));
+                }
             }
         }
 

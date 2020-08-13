@@ -1,2 +1,3 @@
 board:
   limit: 32
+use-ProtocolLib: true

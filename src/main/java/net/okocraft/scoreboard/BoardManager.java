@@ -4,7 +4,9 @@ import com.github.siroshun09.configapi.bukkit.BukkitConfig;
 import com.github.siroshun09.configapi.bukkit.BukkitYaml;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.board.Line;
-import net.okocraft.scoreboard.player.DisplayedBoard;
+import net.okocraft.scoreboard.display.board.BukkitDisplayedBoard;
+import net.okocraft.scoreboard.display.board.DisplayedBoard;
+import net.okocraft.scoreboard.display.board.PacketDisplayBoard;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +37,15 @@ public class BoardManager {
                 .findFirst()
                 .orElse(1L);
 
-        interval = Math.min(minInterval, defBoard.getTitle().getInterval());
+        if (defBoard.getTitle().shouldUpdate()) {
+            interval = Math.min(minInterval, defBoard.getTitle().getInterval());
+        } else {
+            interval = minInterval;
+        }
+
+        if (plugin.isUsingProtocolLib()) {
+            plugin.getLogger().info("We are using ProtocolLib.");
+        }
 
         plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this::update, interval, interval);
     }
@@ -45,7 +55,15 @@ public class BoardManager {
     }
 
     public void showDefault(@NotNull Player player) {
-        displayedBoards.add(new DisplayedBoard(plugin, defBoard, player));
+        DisplayedBoard display;
+
+        if (plugin.isUsingProtocolLib()) {
+            display = new PacketDisplayBoard(plugin, defBoard, player);
+        } else {
+            display = new BukkitDisplayedBoard(plugin, defBoard, player);
+        }
+
+        displayedBoards.add(display);
     }
 
     public void removeBoard(@NotNull Player player) {

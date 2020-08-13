@@ -2,7 +2,7 @@ package net.okocraft.scoreboard;
 
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
-import org.bukkit.ChatColor;
+import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +22,8 @@ public class ScoreboardPlugin extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
 
+        executor = Executors.newCachedThreadPool();
+
         try {
             boardManager = new BoardManager(this);
         } catch (IllegalStateException e) {
@@ -30,10 +32,9 @@ public class ScoreboardPlugin extends JavaPlugin {
             return;
         }
 
+        LengthChecker.setLimit(Math.max(getConfig().getInt("board.limit", 32), 1));
+
         listener = new PlayerListener(this);
-
-        executor = Executors.newCachedThreadPool();
-
         listener.register();
 
         getServer().getScheduler().runTaskLater(this, this::checkPlaceholderAPI, 1);
@@ -86,41 +87,12 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     @NotNull
-    public String checkLength(@NotNull String str) {
-        int limit = Math.min(getConfig().getInt("board.limit", 32), 64);
-        if (limit < ChatColor.stripColor(str).length()) {
-
-            boolean bool = false;
-            int colors = 0;
-            int length = 0;
-
-            for (char c : str.toCharArray()) {
-                if (bool) {
-                    if (-1 < "0123456789abcdefklmnor".indexOf(c)) {
-                        colors += 2;
-                    }
-                    bool = false;
-                    continue;
-                }
-
-                if (c == ChatColor.COLOR_CHAR) {
-                    bool = true;
-                }
-
-                length++;
-
-                if (limit < length) {
-                    break;
-                }
-            }
-
-            return str.substring(0, length + colors - 1);
-        } else {
-            return str;
-        }
+    public ExecutorService getExecutor() {
+        return executor;
     }
 
-    public void runAsync(@NotNull Runnable task) {
-        executor.submit(task);
+    boolean isUsingProtocolLib() {
+        return getConfig().getBoolean("use-ProtocolLib", true) &&
+                getServer().getPluginManager().getPlugin("ProtocolLib") != null;
     }
 }

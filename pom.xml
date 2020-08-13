@@ -31,6 +31,10 @@
             <id>bintray-siroplugins-maven-repo</id>
             <url>https://dl.bintray.com/siroplugins/maven-repo</url>
         </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/nexus/repository/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -43,14 +47,14 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.10.6</version>
+            <version>2.10.9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.lucko</groupId>
-            <artifactId>helper</artifactId>
-            <version>5.6.2</version>
-            <scope>compile</scope>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.6.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.siroshun09.configapi</groupId>
@@ -126,8 +130,12 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <relocations>
                         <relocation>
-                            <pattern>com.github.siroshun09.configapi</pattern>
-                            <shadedPattern>net.okocraft.scoreboard.lib.configapi</shadedPattern>
+                            <pattern>com.github.siroshun09</pattern>
+                            <shadedPattern>${project.groupId}.lib</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.lucko</pattern>
+                            <shadedPattern>${project.groupId}.lib</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

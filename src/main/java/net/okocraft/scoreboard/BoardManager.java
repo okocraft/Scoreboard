@@ -56,8 +56,6 @@ public class BoardManager {
             board.cancelUpdateTasks();
             displayedBoards.remove(board);
         }
-
-        player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());
     }
 
     public void removeAll() {

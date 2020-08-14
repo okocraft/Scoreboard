@@ -1,10 +1,27 @@
 package net.okocraft.scoreboard.display.board;
 
+import net.okocraft.scoreboard.display.line.DisplayedLine;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public interface DisplayedBoard {
 
+    @NotNull
     Player getPlayer();
 
-    void update();
+    @NotNull
+    DisplayedLine getTitle();
+
+    @NotNull
+    List<DisplayedLine> getLines();
+
+    void applyTitle();
+
+    void applyLine(@NotNull DisplayedLine line);
+
+    void scheduleUpdateTasks();
+
+    void cancelUpdateTasks();
 }

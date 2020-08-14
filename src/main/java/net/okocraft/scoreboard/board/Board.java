@@ -14,14 +14,6 @@ public class Board {
         this.lines = lines;
     }
 
-    public void update(long increment) {
-        if (title.shouldUpdate()) {
-            title.update(increment);
-        }
-
-        lines.stream().filter(Line::shouldUpdate).forEach(l -> l.update(increment));
-    }
-
     @NotNull
     public Line getTitle() {
         return title;

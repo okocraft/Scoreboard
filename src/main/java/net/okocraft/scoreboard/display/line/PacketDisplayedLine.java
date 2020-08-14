@@ -30,10 +30,7 @@ public class PacketDisplayedLine extends DisplayedLine {
 
     @NotNull
     public WrappedChatComponent getCurrentLineComponent() {
-        if (isChanged()) {
-            currentLineComponent = WrappedChatComponent.fromText(getCurrentLine());
-        }
-
+        currentLineComponent = WrappedChatComponent.fromText(getCurrentLine());
         return currentLineComponent;
     }
 

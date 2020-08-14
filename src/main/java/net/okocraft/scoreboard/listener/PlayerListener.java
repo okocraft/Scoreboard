@@ -32,6 +32,6 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onQuit(@NotNull PlayerQuitEvent event) {
-        plugin.getBoardManager().removeBoard(event.getPlayer());
+        plugin.getExecutor().submit(() -> plugin.getBoardManager().removeBoard(event.getPlayer()));
     }
 }

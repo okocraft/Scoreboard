@@ -2,6 +2,7 @@ package net.okocraft.scoreboard;
 
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.task.AbstractUpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -9,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class ScoreboardPlugin extends JavaPlugin {
 
@@ -16,6 +20,7 @@ public class ScoreboardPlugin extends JavaPlugin {
     private BoardManager boardManager;
     private PlayerListener listener;
     private ExecutorService executor;
+    private ScheduledExecutorService scheduler;
 
     @Override
     public void onEnable() {
@@ -23,6 +28,11 @@ public class ScoreboardPlugin extends JavaPlugin {
         reloadConfig();
 
         executor = Executors.newCachedThreadPool();
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        if (isUsingProtocolLib()) {
+            getLogger().info("We are using ProtocolLib.");
+        }
 
         try {
             boardManager = new BoardManager(this);
@@ -53,6 +63,10 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         if (executor != null) {
             executor.shutdownNow();
+        }
+
+        if (scheduler != null) {
+            scheduler.shutdownNow();
         }
     }
 
@@ -89,6 +103,12 @@ public class ScoreboardPlugin extends JavaPlugin {
     @NotNull
     public ExecutorService getExecutor() {
         return executor;
+    }
+
+    @NotNull
+    public ScheduledFuture<?> scheduleUpdateTask(@NotNull AbstractUpdateTask task, long tick) {
+        long interval = tick * 50;
+        return scheduler.scheduleWithFixedDelay(() -> executor.submit(task), interval, interval, TimeUnit.MILLISECONDS);
     }
 
     boolean isUsingProtocolLib() {

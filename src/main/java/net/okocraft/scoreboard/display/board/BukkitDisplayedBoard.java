@@ -55,19 +55,16 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
     }
 
     @Override
-    protected void apply() {
+    public void applyTitle() {
         if (title.isChanged()) {
             objective.setDisplayName(title.getCurrentLine());
         }
+    }
 
-        for (int i = 0, l = lines.size(); i < l; i++) {
-            DisplayedLine line = lines.get(i);
-
-            if (!line.isChanged()) {
-                continue;
-            }
-
-            Team team = scoreboard.getTeam(String.valueOf(i));
+    @Override
+    public void applyLine(@NotNull DisplayedLine line) {
+        if (line.isChanged()) {
+            Team team = scoreboard.getTeam(line.getTeamName());
 
             if (team != null) {
                 team.setPrefix(line.getCurrentLine());
@@ -77,13 +74,13 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
 
     @Override
     @NotNull
-    protected DisplayedLine getTitle() {
+    public DisplayedLine getTitle() {
         return title;
     }
 
     @Override
     @NotNull
-    protected List<DisplayedLine> getLines() {
+    public List<DisplayedLine> getLines() {
         return lines;
     }
 }

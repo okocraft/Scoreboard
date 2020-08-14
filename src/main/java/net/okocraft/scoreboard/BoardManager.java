@@ -23,31 +23,12 @@ public class BoardManager {
     private final ScoreboardPlugin plugin;
     private final Board defBoard;
     private final Set<DisplayedBoard> displayedBoards;
-    private final long interval;
 
     BoardManager(@NotNull ScoreboardPlugin plugin) {
         this.plugin = plugin;
         this.displayedBoards = new HashSet<>();
 
         defBoard = loadBoard(new BukkitConfig(plugin, "default.yml", true));
-
-        long minInterval = defBoard.getLines().stream()
-                .map(Line::getInterval)
-                .filter(i -> 0 < i).sorted()
-                .findFirst()
-                .orElse(1L);
-
-        if (defBoard.getTitle().shouldUpdate()) {
-            interval = Math.min(minInterval, defBoard.getTitle().getInterval());
-        } else {
-            interval = minInterval;
-        }
-
-        if (plugin.isUsingProtocolLib()) {
-            plugin.getLogger().info("We are using ProtocolLib.");
-        }
-
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this::update, interval, interval);
     }
 
     public void showAllDefault() {
@@ -63,14 +44,18 @@ public class BoardManager {
             display = new BukkitDisplayedBoard(plugin, defBoard, player);
         }
 
+        display.scheduleUpdateTasks();
         displayedBoards.add(display);
     }
 
     public void removeBoard(@NotNull Player player) {
-        displayedBoards.stream()
-                .filter(b -> b.getPlayer().equals(player))
-                .collect(Collectors.toSet())
-                .forEach(displayedBoards::remove);
+        Set<DisplayedBoard> playerBoards =
+                displayedBoards.stream().filter(b -> b.getPlayer().equals(player)).collect(Collectors.toSet());
+
+        for (DisplayedBoard board : playerBoards) {
+            board.cancelUpdateTasks();
+            displayedBoards.remove(board);
+        }
 
         player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());
     }
@@ -86,17 +71,10 @@ public class BoardManager {
         displayedBoards.clear();
     }
 
-    public void update() {
-        if (!plugin.getServer().getOnlinePlayers().isEmpty()) {
-            defBoard.update(interval);
-            displayedBoards.forEach(DisplayedBoard::update);
-        }
-    }
-
     @NotNull
     private Board loadBoard(@NotNull BukkitYaml yaml) {
         if (!yaml.load()) {
-            throw new IllegalStateException("Could not load default board");
+            throw new IllegalStateException("Could not load " + yaml.getPath().getFileName().toString());
         }
 
         List<String> titleList = yaml.getStringList("title.list");

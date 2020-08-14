@@ -27,7 +27,6 @@ public class PacketDisplayBoard extends AbstractDisplayedBoard {
     private final static Class<?> ENUM_CHAT_FORMAT = MinecraftReflection.getMinecraftClass("EnumChatFormat");
 
     private final PacketContainer objectivePacket;
-    private final PacketContainer teamPacket;
 
     private final String id = Long.toHexString(System.nanoTime());
 
@@ -39,17 +38,14 @@ public class PacketDisplayBoard extends AbstractDisplayedBoard {
         super(plugin, player);
 
         objectivePacket = newObjectivePacket(id);
-        teamPacket = newTeamPacket();
 
         this.title = new PacketDisplayedLine(player, board.getTitle(), 0, 0);
 
-        List<PacketDisplayedLine> lines = new LinkedList<>();
+        this.lines = new LinkedList<>();
 
         for (int i = 0, l = board.getLines().size(), c = ChatColor.values().length; i < l && i < c; i++) {
             lines.add(new PacketDisplayedLine(player, board.getLines().get(i), i, l - i));
         }
-
-        this.lines = List.copyOf(lines);
 
         plugin.getExecutor().submit(() -> {
             sendObjectiveCreationPacket();
@@ -61,42 +57,37 @@ public class PacketDisplayBoard extends AbstractDisplayedBoard {
     }
 
     @Override
-    protected void apply() {
-        sendUpdatedTitle();
-        sendUpdatedLines();
-    }
-
-    @Override
-    @NotNull
-    protected DisplayedLine getTitle() {
-        return title;
-    }
-
-    @Override
-    @NotNull
-    protected List<DisplayedLine> getLines() {
-        return List.copyOf(lines);
-    }
-
-    private void sendUpdatedTitle() {
+    public void applyTitle() {
         if (title.isChanged()) {
             objectivePacket.getChatComponents().write(0, title.getCurrentLineComponent());
             sendPacket(objectivePacket);
         }
     }
 
-    private void sendUpdatedLines() {
-        for (PacketDisplayedLine line : lines) {
-            if (line.isChanged()) {
-                teamPacket.getStrings().write(0, line.getId());
+    @Override
+    public void applyLine(@NotNull DisplayedLine line) {
+        if (line.isChanged() && line instanceof PacketDisplayedLine) {
+            PacketDisplayedLine packetLine = (PacketDisplayedLine) line;
+            PacketContainer packet = newTeamPacket();
 
-                teamPacket.getChatComponents().write(0, line.getTeamNameComponent());
+            packet.getStrings().write(0, packetLine.getId());
+            packet.getChatComponents().write(0, packetLine.getTeamNameComponent());
+            packet.getChatComponents().write(1, packetLine.getCurrentLineComponent());
 
-                teamPacket.getChatComponents().write(1, line.getCurrentLineComponent());
-
-                sendPacket(teamPacket);
-            }
+            sendPacket(packet);
         }
+    }
+
+    @Override
+    @NotNull
+    public DisplayedLine getTitle() {
+        return title;
+    }
+
+    @Override
+    @NotNull
+    public List<DisplayedLine> getLines() {
+        return List.copyOf(lines);
     }
 
     private void sendObjectiveCreationPacket() {

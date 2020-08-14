@@ -1,6 +1,5 @@
 package net.okocraft.scoreboard.board;
 
-import com.github.siroshun09.textlibs.util.Colorizer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -13,18 +12,23 @@ public class Line {
     private final long interval;
     private final boolean shouldUpdate;
 
-    private String currentLine = "";
-    private int currentIndex = 0;
-    private long count = 0;
-
     public Line(@NotNull List<String> lines, long interval) {
         this.lines = List.copyOf(lines);
-        this.shouldUpdate = 0 < interval;
+        this.shouldUpdate = !lines.isEmpty() && 0 < interval;
         this.interval = interval;
+    }
 
-        if (!lines.isEmpty()) {
-            currentLine = Colorizer.colorize(lines.get(0));
-        }
+    public boolean isEmpty() {
+        return lines.isEmpty();
+    }
+
+    public int getMaxIndex() {
+        return lines.size() - 1;
+    }
+
+    @NotNull
+    public String get(int index) {
+        return lines.get(index);
     }
 
     public boolean shouldUpdate() {
@@ -33,26 +37,5 @@ public class Line {
 
     public long getInterval() {
         return interval;
-    }
-
-    public void update(long increment) {
-        if (interval <= count) {
-            count = 0;
-
-            currentIndex++;
-
-            if (lines.size() <= currentIndex) {
-                currentIndex = 0;
-            }
-
-            currentLine = Colorizer.colorize(lines.get(currentIndex));
-        } else {
-            count += increment;
-        }
-    }
-
-    @NotNull
-    public String getCurrentLine() {
-        return currentLine;
     }
 }

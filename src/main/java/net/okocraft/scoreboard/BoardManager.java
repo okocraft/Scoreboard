@@ -44,7 +44,7 @@ public class BoardManager {
             display = new BukkitDisplayedBoard(plugin, defBoard, player);
         }
 
-        display.scheduleUpdateTasks();
+        plugin.getExecutor().submit(display::scheduleUpdateTasks);
         displayedBoards.add(display);
     }
 

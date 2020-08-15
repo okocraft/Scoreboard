@@ -17,7 +17,7 @@ public final class PlaceholderAPIHooker {
     }
 
     public static String run(@NotNull Player player, @NotNull String str) {
-        if (isEnabled() && PlaceholderReplacer.hasPlaceholder(str)) {
+        if (isEnabled() && str.contains("%")) {
             return PlaceholderReplacer.run(player, str);
         } else {
             return str;

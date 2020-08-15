@@ -10,8 +10,4 @@ public final class PlaceholderReplacer {
     public static String run(@NotNull Player player, @NotNull String str) {
         return PlaceholderAPI.setPlaceholders(player, str);
     }
-
-    public static boolean hasPlaceholder(@NotNull String str) {
-        return PlaceholderAPI.containsPlaceholders(str);
-    }
 }

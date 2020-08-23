@@ -2,7 +2,7 @@ package net.okocraft.scoreboard;
 
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
-import net.okocraft.scoreboard.task.AbstractUpdateTask;
+import net.okocraft.scoreboard.task.UpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -106,7 +106,7 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     @NotNull
-    public ScheduledFuture<?> scheduleUpdateTask(@NotNull AbstractUpdateTask task, long tick) {
+    public ScheduledFuture<?> scheduleUpdateTask(@NotNull UpdateTask task, long tick) {
         long interval = tick * 50;
         return scheduler.scheduleWithFixedDelay(() -> executor.submit(task), interval, interval, TimeUnit.MILLISECONDS);
     }

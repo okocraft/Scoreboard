@@ -11,7 +11,7 @@ public class TitleUpdateTask extends AbstractUpdateTask {
     }
 
     @Override
-    protected void apply() {
+    public void apply() {
         board.applyTitle();
     }
 }

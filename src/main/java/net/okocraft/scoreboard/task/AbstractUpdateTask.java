@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractUpdateTask implements Runnable {
+public abstract class AbstractUpdateTask implements UpdateTask {
 
     private final ScoreboardPlugin plugin;
 
@@ -56,6 +56,4 @@ public abstract class AbstractUpdateTask implements Runnable {
         line.checkLength();
         apply();
     }
-
-    protected abstract void apply();
 }

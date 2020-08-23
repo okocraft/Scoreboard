@@ -12,7 +12,7 @@ public class LineUpdateTask extends AbstractUpdateTask {
     }
 
     @Override
-    protected void apply() {
+    public void apply() {
         board.applyLine(line);
     }
 }

@@ -8,7 +8,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.regex.Pattern;
+
 public class DisplayedLine {
+
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("[%]([^%]+)[%]");
 
     private final Player player;
     private final Line line;
@@ -69,6 +73,10 @@ public class DisplayedLine {
             prevLine = currentLine;
             return true;
         }
+    }
+
+    public boolean hasPlaceholders() {
+        return PLACEHOLDER_PATTERN.matcher(currentLine).find();
     }
 
     public boolean shouldUpdate() {

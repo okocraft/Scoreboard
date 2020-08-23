@@ -27,7 +27,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
 
-        executor = Executors.newCachedThreadPool();
+        executor = Executors.newFixedThreadPool(Math.max(1, getConfig().getInt("board.threads", 5)));
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         if (isUsingProtocolLib()) {

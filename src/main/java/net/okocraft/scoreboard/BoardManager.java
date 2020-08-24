@@ -44,8 +44,12 @@ public class BoardManager {
             display = new BukkitDisplayedBoard(plugin, defBoard, player);
         }
 
-        plugin.getExecutor().submit(display::scheduleUpdateTasks);
-        displayedBoards.add(display);
+        plugin.getExecutor().submit(() -> {
+            display.scheduleUpdateTasks();
+            synchronized (displayedBoards) {
+                displayedBoards.add(display);
+            }
+        });
     }
 
     public void removeBoard(@NotNull Player player) {
@@ -54,19 +58,23 @@ public class BoardManager {
 
         for (DisplayedBoard board : playerBoards) {
             board.cancelUpdateTasks();
-            displayedBoards.remove(board);
+            synchronized (displayedBoards) {
+                displayedBoards.remove(board);
+            }
         }
     }
 
     public void removeAll() {
-        for (DisplayedBoard displayed : displayedBoards) {
+        for (DisplayedBoard displayed : Set.copyOf(displayedBoards)) {
             Player player = displayed.getPlayer();
             if (player.isOnline()) {
                 player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());
             }
         }
 
-        displayedBoards.clear();
+        synchronized (displayedBoards) {
+            displayedBoards.clear();
+        }
     }
 
     @NotNull

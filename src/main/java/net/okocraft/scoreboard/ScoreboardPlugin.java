@@ -1,6 +1,7 @@
 package net.okocraft.scoreboard;
 
 import net.okocraft.scoreboard.listener.PlayerListener;
+import net.okocraft.scoreboard.listener.PluginListener;
 import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.task.UpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
@@ -18,9 +19,11 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     private ScoreboardManager scoreboardManager;
     private BoardManager boardManager;
-    private PlayerListener listener;
+    private PlayerListener playerListener;
+    private PluginListener pluginListener;
     private ExecutorService executor;
     private ScheduledExecutorService scheduler;
+    private boolean useProtocolLib;
 
     @Override
     public void onEnable() {
@@ -29,10 +32,6 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         executor = Executors.newFixedThreadPool(Math.max(1, getConfig().getInt("board.threads", 5)));
         scheduler = Executors.newSingleThreadScheduledExecutor();
-
-        if (isUsingProtocolLib()) {
-            getLogger().info("We are using ProtocolLib.");
-        }
 
         try {
             boardManager = new BoardManager(this);
@@ -44,10 +43,14 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         LengthChecker.setLimit(Math.max(getConfig().getInt("board.limit", 32), 1));
 
-        listener = new PlayerListener(this);
-        listener.register();
+        playerListener = new PlayerListener(this);
+        playerListener.register();
+
+        pluginListener = new PluginListener(this);
+        pluginListener.register();
 
         getServer().getScheduler().runTaskLater(this, this::checkPlaceholderAPI, 1);
+        getServer().getScheduler().runTaskLater(this, this::checkProtocolLib, 1);
         getServer().getScheduler().runTaskLater(this, boardManager::showAllDefault, 2);
     }
 
@@ -57,8 +60,12 @@ public class ScoreboardPlugin extends JavaPlugin {
             boardManager.removeAll();
         }
 
-        if (listener != null) {
-            listener.unregister();
+        if (playerListener != null) {
+            playerListener.unregister();
+        }
+
+        if (pluginListener != null) {
+            pluginListener.unregister();
         }
 
         if (executor != null) {
@@ -92,14 +99,6 @@ public class ScoreboardPlugin extends JavaPlugin {
         return boardManager;
     }
 
-    private void checkPlaceholderAPI() {
-        PlaceholderAPIHooker.checkEnabled();
-
-        if (PlaceholderAPIHooker.isEnabled()) {
-            getLogger().info("PlaceholderAPI is available!");
-        }
-    }
-
     @NotNull
     public ExecutorService getExecutor() {
         return executor;
@@ -111,8 +110,28 @@ public class ScoreboardPlugin extends JavaPlugin {
         return scheduler.scheduleWithFixedDelay(() -> executor.submit(task), interval, interval, TimeUnit.MILLISECONDS);
     }
 
+    public void checkPlaceholderAPI() {
+        PlaceholderAPIHooker.setEnabled(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null);
+
+        if (PlaceholderAPIHooker.isEnabled()) {
+            getLogger().info("PlaceholderAPI is available!");
+        }
+    }
+
+    public void checkProtocolLib() {
+        useProtocolLib = getServer().getPluginManager().getPlugin("ProtocolLib") != null && getConfig().getBoolean("use-ProtocolLib", true);
+
+        if (useProtocolLib) {
+            getLogger().info("We are using ProtocolLib.");
+        } else {
+            getLogger().info("We are using Bukkit's Scoreboard.");
+        }
+
+        boardManager.removeAll();
+        boardManager.showAllDefault();
+    }
+
     boolean isUsingProtocolLib() {
-        return getConfig().getBoolean("use-ProtocolLib", true) &&
-                getServer().getPluginManager().getPlugin("ProtocolLib") != null;
+        return useProtocolLib;
     }
 }

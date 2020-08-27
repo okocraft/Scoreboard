@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
-public class DisplayedLine {
+public class LineDisplay {
 
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("[%]([^%]+)[%]");
 
@@ -24,7 +24,7 @@ public class DisplayedLine {
 
     private int currentIndex = 0;
 
-    public DisplayedLine(@NotNull Player player, @NotNull Line line, int num) {
+    public LineDisplay(@NotNull Player player, @NotNull Line line, int num) {
         this.player = player;
         this.line = line;
         this.teamName = String.valueOf(num);

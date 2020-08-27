@@ -8,8 +8,8 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
-import net.okocraft.scoreboard.display.line.DisplayedLine;
-import net.okocraft.scoreboard.display.line.PacketDisplayedLine;
+import net.okocraft.scoreboard.display.line.LineDisplay;
+import net.okocraft.scoreboard.display.line.PacketLineDisplay;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +31,8 @@ public class PacketBoardDisplay extends AbstractBoardDisplay {
 
     private final String id = Long.toHexString(System.nanoTime());
 
-    private final PacketDisplayedLine title;
-    private final List<PacketDisplayedLine> lines;
+    private final PacketLineDisplay title;
+    private final List<PacketLineDisplay> lines;
     private final AtomicBoolean visible;
 
 
@@ -41,12 +41,12 @@ public class PacketBoardDisplay extends AbstractBoardDisplay {
 
         objectivePacket = newObjectivePacket(id);
 
-        this.title = new PacketDisplayedLine(player, board.getTitle(), 0, 0);
+        this.title = new PacketLineDisplay(player, board.getTitle(), 0, 0);
 
         this.lines = new LinkedList<>();
 
         for (int i = 0, l = board.getLines().size(), c = ChatColor.values().length; i < l && i < c; i++) {
-            lines.add(new PacketDisplayedLine(player, board.getLines().get(i), i, l - i));
+            lines.add(new PacketLineDisplay(player, board.getLines().get(i), i, l - i));
         }
 
         this.visible = new AtomicBoolean(false);
@@ -86,9 +86,9 @@ public class PacketBoardDisplay extends AbstractBoardDisplay {
     }
 
     @Override
-    public void applyLine(@NotNull DisplayedLine line) {
-        if (line.isChanged() && line instanceof PacketDisplayedLine) {
-            PacketDisplayedLine packetLine = (PacketDisplayedLine) line;
+    public void applyLine(@NotNull LineDisplay line) {
+        if (line.isChanged() && line instanceof PacketLineDisplay) {
+            PacketLineDisplay packetLine = (PacketLineDisplay) line;
             PacketContainer packet = newTeamPacket();
 
             packet.getStrings().write(0, packetLine.getId());
@@ -101,13 +101,13 @@ public class PacketBoardDisplay extends AbstractBoardDisplay {
 
     @Override
     @NotNull
-    public DisplayedLine getTitle() {
+    public LineDisplay getTitle() {
         return title;
     }
 
     @Override
     @NotNull
-    public List<DisplayedLine> getLines() {
+    public List<LineDisplay> getLines() {
         return List.copyOf(lines);
     }
 
@@ -128,7 +128,7 @@ public class PacketBoardDisplay extends AbstractBoardDisplay {
         sendPacket(packet);
     }
 
-    private void sendTeamCreationPacket(@NotNull PacketDisplayedLine line) {
+    private void sendTeamCreationPacket(@NotNull PacketLineDisplay line) {
         PacketContainer packet = newTeamPacket();
 
         packet.getStrings().write(0, line.getId());

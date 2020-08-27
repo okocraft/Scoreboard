@@ -2,7 +2,7 @@ package net.okocraft.scoreboard.display.board;
 
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
-import net.okocraft.scoreboard.display.line.DisplayedLine;
+import net.okocraft.scoreboard.display.line.LineDisplay;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -20,15 +20,15 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
     private final Scoreboard scoreboard;
     private final Objective objective;
 
-    private final DisplayedLine title;
-    private final List<DisplayedLine> lines;
+    private final LineDisplay title;
+    private final List<LineDisplay> lines;
 
     public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
         super(plugin, player);
 
         scoreboard = plugin.getScoreboardManager().getNewScoreboard();
 
-        this.title = new DisplayedLine(player, board.getTitle(), 0);
+        this.title = new LineDisplay(player, board.getTitle(), 0);
 
         objective = scoreboard.registerNewObjective("sb", "sb", title.getCurrentLine(), RenderType.INTEGER);
 
@@ -37,7 +37,7 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
         this.lines = new LinkedList<>();
 
         for (int i = 0, l = board.getLines().size(), c = ChatColor.values().length; i < l && i < c; i++) {
-            DisplayedLine line = new DisplayedLine(player, board.getLines().get(i), i);
+            LineDisplay line = new LineDisplay(player, board.getLines().get(i), i);
 
             Team team = scoreboard.registerNewTeam(line.getTeamName());
 
@@ -75,7 +75,7 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
     }
 
     @Override
-    public void applyLine(@NotNull DisplayedLine line) {
+    public void applyLine(@NotNull LineDisplay line) {
         if (line.isChanged()) {
             Team team = scoreboard.getTeam(line.getTeamName());
 
@@ -87,13 +87,13 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
     @Override
     @NotNull
-    public DisplayedLine getTitle() {
+    public LineDisplay getTitle() {
         return title;
     }
 
     @Override
     @NotNull
-    public List<DisplayedLine> getLines() {
+    public List<LineDisplay> getLines() {
         return lines;
     }
 }

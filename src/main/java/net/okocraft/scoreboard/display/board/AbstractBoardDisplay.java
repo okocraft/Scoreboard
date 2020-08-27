@@ -1,7 +1,7 @@
 package net.okocraft.scoreboard.display.board;
 
 import net.okocraft.scoreboard.ScoreboardPlugin;
-import net.okocraft.scoreboard.display.line.DisplayedLine;
+import net.okocraft.scoreboard.display.line.LineDisplay;
 import net.okocraft.scoreboard.task.LineUpdateTask;
 import net.okocraft.scoreboard.task.TitleUpdateTask;
 import org.bukkit.entity.Player;
@@ -38,7 +38,7 @@ public abstract class AbstractBoardDisplay implements BoardDisplay {
             updateTasks.add(plugin.scheduleUpdateTask(new TitleUpdateTask(plugin, this), getTitle().getInterval()));
         }
 
-        for (DisplayedLine line : getLines()) {
+        for (LineDisplay line : getLines()) {
             if (line.shouldUpdate()) {
                 updateTasks.add(plugin.scheduleUpdateTask(new LineUpdateTask(plugin, this, line), line.getInterval()));
             }

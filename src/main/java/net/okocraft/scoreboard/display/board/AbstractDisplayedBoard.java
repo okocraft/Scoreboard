@@ -48,6 +48,7 @@ public abstract class AbstractDisplayedBoard implements DisplayedBoard {
     @Override
     public void cancelUpdateTasks() {
         updateTasks.stream().filter(t -> !t.isCancelled()).forEach(t -> t.cancel(true));
+        updateTasks.clear();
     }
 
     @Override

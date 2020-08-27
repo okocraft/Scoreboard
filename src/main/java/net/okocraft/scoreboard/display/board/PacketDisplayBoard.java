@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 public class PacketDisplayBoard extends AbstractDisplayedBoard {
@@ -32,6 +33,7 @@ public class PacketDisplayBoard extends AbstractDisplayedBoard {
 
     private final PacketDisplayedLine title;
     private final List<PacketDisplayedLine> lines;
+    private final AtomicBoolean visible;
 
 
     public PacketDisplayBoard(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
@@ -47,13 +49,32 @@ public class PacketDisplayBoard extends AbstractDisplayedBoard {
             lines.add(new PacketDisplayedLine(player, board.getLines().get(i), i, l - i));
         }
 
-        plugin.getExecutor().submit(() -> {
-            sendObjectiveCreationPacket();
+        this.visible = new AtomicBoolean(false);
+    }
 
-            sendDisplaySlotPacket();
+    @Override
+    public boolean isVisible() {
+        return visible.get();
+    }
 
-            lines.forEach(this::sendTeamCreationPacket);
-        });
+    @Override
+    public void showBoard() {
+        sendObjectiveCreationPacket();
+        sendDisplaySlotPacket();
+        lines.forEach(this::sendTeamCreationPacket);
+
+        scheduleUpdateTasks();
+
+        visible.set(true);
+    }
+
+    @Override
+    public void hideBoard() {
+        sendObjectiveRemovalPacket();
+
+        cancelUpdateTasks();
+
+        visible.set(false);
     }
 
     @Override
@@ -95,6 +116,14 @@ public class PacketDisplayBoard extends AbstractDisplayedBoard {
 
         packet.getIntegers().write(0, 0);
         packet.getChatComponents().write(0, WrappedChatComponent.fromText(title.getCurrentLine()));
+
+        sendPacket(packet);
+    }
+
+    private void sendObjectiveRemovalPacket() {
+        PacketContainer packet = newObjectivePacket(id);
+
+        packet.getIntegers().write(0, 1);
 
         sendPacket(packet);
     }

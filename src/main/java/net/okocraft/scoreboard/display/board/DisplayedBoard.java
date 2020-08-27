@@ -17,6 +17,12 @@ public interface DisplayedBoard {
     @NotNull
     List<DisplayedLine> getLines();
 
+    boolean isVisible();
+
+    void showBoard();
+
+    void hideBoard();
+
     void applyTitle();
 
     void applyLine(@NotNull DisplayedLine line);

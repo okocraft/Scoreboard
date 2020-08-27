@@ -34,7 +34,7 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
 
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        List<DisplayedLine> lines = new LinkedList<>();
+        this.lines = new LinkedList<>();
 
         for (int i = 0, l = board.getLines().size(), c = ChatColor.values().length; i < l && i < c; i++) {
             DisplayedLine line = new DisplayedLine(player, board.getLines().get(i), i);
@@ -48,10 +48,23 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
             objective.getScore(line.getEntryName()).setScore(l - i);
             lines.add(line);
         }
+    }
 
-        this.lines = List.copyOf(lines);
+    @Override
+    public boolean isVisible() {
+        return player.getScoreboard().equals(scoreboard);
+    }
 
+    @Override
+    public void showBoard() {
         player.setScoreboard(scoreboard);
+        scheduleUpdateTasks();
+    }
+
+    @Override
+    public void hideBoard() {
+        player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());
+        cancelUpdateTasks();
     }
 
     @Override

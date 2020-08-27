@@ -131,7 +131,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         boardManager.showAllDefault();
     }
 
-    boolean isUsingProtocolLib() {
+    public boolean isUsingProtocolLib() {
         return useProtocolLib;
     }
 }

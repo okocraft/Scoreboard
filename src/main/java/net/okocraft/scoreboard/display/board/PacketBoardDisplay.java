@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
-public class PacketDisplayBoardDisplay extends AbstractBoardDisplay {
+public class PacketBoardDisplay extends AbstractBoardDisplay {
 
     private final static WrappedChatComponent SUFFIX = WrappedChatComponent.fromText(ChatColor.RESET.toString());
     private final static String ALWAYS = "always";
@@ -36,7 +36,7 @@ public class PacketDisplayBoardDisplay extends AbstractBoardDisplay {
     private final AtomicBoolean visible;
 
 
-    public PacketDisplayBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
+    public PacketBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
         super(plugin, player);
 
         objectivePacket = newObjectivePacket(id);

@@ -6,7 +6,7 @@ import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.board.Line;
 import net.okocraft.scoreboard.display.board.BukkitBoardDisplay;
 import net.okocraft.scoreboard.display.board.BoardDisplay;
-import net.okocraft.scoreboard.display.board.PacketDisplayBoardDisplay;
+import net.okocraft.scoreboard.display.board.PacketBoardDisplay;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,7 @@ public class BoardManager {
         BoardDisplay display;
 
         if (plugin.isUsingProtocolLib()) {
-            display = new PacketDisplayBoardDisplay(plugin, defBoard, player);
+            display = new PacketBoardDisplay(plugin, defBoard, player);
         } else {
             display = new BukkitBoardDisplay(plugin, defBoard, player);
         }

@@ -4,9 +4,9 @@ import com.github.siroshun09.configapi.bukkit.BukkitConfig;
 import com.github.siroshun09.configapi.bukkit.BukkitYaml;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.board.Line;
-import net.okocraft.scoreboard.display.board.BukkitDisplayedBoard;
-import net.okocraft.scoreboard.display.board.DisplayedBoard;
-import net.okocraft.scoreboard.display.board.PacketDisplayBoard;
+import net.okocraft.scoreboard.display.board.BukkitBoardDisplay;
+import net.okocraft.scoreboard.display.board.BoardDisplay;
+import net.okocraft.scoreboard.display.board.PacketDisplayBoardDisplay;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public class BoardManager {
 
     private final ScoreboardPlugin plugin;
     private final Board defBoard;
-    private final Set<DisplayedBoard> displayedBoards;
+    private final Set<BoardDisplay> displayedBoards;
 
     BoardManager(@NotNull ScoreboardPlugin plugin) {
         this.plugin = plugin;
@@ -36,12 +36,12 @@ public class BoardManager {
     }
 
     public void showDefault(@NotNull Player player) {
-        DisplayedBoard display;
+        BoardDisplay display;
 
         if (plugin.isUsingProtocolLib()) {
-            display = new PacketDisplayBoard(plugin, defBoard, player);
+            display = new PacketDisplayBoardDisplay(plugin, defBoard, player);
         } else {
-            display = new BukkitDisplayedBoard(plugin, defBoard, player);
+            display = new BukkitBoardDisplay(plugin, defBoard, player);
         }
 
         plugin.getExecutor().submit(() -> {
@@ -53,10 +53,10 @@ public class BoardManager {
     }
 
     public void removeBoard(@NotNull Player player) {
-        Set<DisplayedBoard> playerBoards =
+        Set<BoardDisplay> playerBoards =
                 displayedBoards.stream().filter(b -> b.getPlayer().equals(player)).collect(Collectors.toSet());
 
-        for (DisplayedBoard board : playerBoards) {
+        for (BoardDisplay board : playerBoards) {
             board.cancelUpdateTasks();
             synchronized (displayedBoards) {
                 displayedBoards.remove(board);
@@ -65,7 +65,7 @@ public class BoardManager {
     }
 
     public void removeAll() {
-        for (DisplayedBoard displayed : Set.copyOf(displayedBoards)) {
+        for (BoardDisplay displayed : Set.copyOf(displayedBoards)) {
             Player player = displayed.getPlayer();
             if (player.isOnline()) {
                 player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());

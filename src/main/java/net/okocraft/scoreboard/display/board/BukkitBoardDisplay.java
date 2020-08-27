@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
+public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
     private final Scoreboard scoreboard;
     private final Objective objective;
@@ -23,7 +23,7 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
     private final DisplayedLine title;
     private final List<DisplayedLine> lines;
 
-    public BukkitDisplayedBoard(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
+    public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
         super(plugin, player);
 
         scoreboard = plugin.getScoreboardManager().getNewScoreboard();

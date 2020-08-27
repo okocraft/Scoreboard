@@ -1,7 +1,7 @@
 package net.okocraft.scoreboard.task;
 
 import net.okocraft.scoreboard.ScoreboardPlugin;
-import net.okocraft.scoreboard.display.board.DisplayedBoard;
+import net.okocraft.scoreboard.display.board.BoardDisplay;
 import net.okocraft.scoreboard.display.line.DisplayedLine;
 import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
 import org.jetbrains.annotations.NotNull;
@@ -12,10 +12,10 @@ public abstract class AbstractUpdateTask implements UpdateTask {
 
     private final ScoreboardPlugin plugin;
 
-    protected final DisplayedBoard board;
+    protected final BoardDisplay board;
     protected final DisplayedLine line;
 
-    public AbstractUpdateTask(@NotNull ScoreboardPlugin plugin, @NotNull DisplayedBoard board, @NotNull DisplayedLine line) {
+    public AbstractUpdateTask(@NotNull ScoreboardPlugin plugin, @NotNull BoardDisplay board, @NotNull DisplayedLine line) {
         this.plugin = plugin;
         this.board = board;
         this.line = line;

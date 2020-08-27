@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface DisplayedBoard {
+public interface BoardDisplay {
 
     @NotNull
     Player getPlayer();

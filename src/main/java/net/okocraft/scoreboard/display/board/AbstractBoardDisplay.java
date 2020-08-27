@@ -12,14 +12,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
-public abstract class AbstractDisplayedBoard implements DisplayedBoard {
+public abstract class AbstractBoardDisplay implements BoardDisplay {
 
     protected final ScoreboardPlugin plugin;
     protected final Player player;
 
     private final Set<ScheduledFuture<?>> updateTasks;
 
-    public AbstractDisplayedBoard(@NotNull ScoreboardPlugin plugin, @NotNull Player player) {
+    public AbstractBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Player player) {
         this.plugin = plugin;
         this.player = player;
 
@@ -54,8 +54,8 @@ public abstract class AbstractDisplayedBoard implements DisplayedBoard {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AbstractDisplayedBoard)) return false;
-        AbstractDisplayedBoard that = (AbstractDisplayedBoard) o;
+        if (!(o instanceof AbstractBoardDisplay)) return false;
+        AbstractBoardDisplay that = (AbstractBoardDisplay) o;
         return player.equals(that.player);
     }
 

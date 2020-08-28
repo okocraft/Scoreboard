@@ -1,6 +1,7 @@
 package net.okocraft.scoreboard.papi;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,11 @@ public final class PlaceholderAPIHooker {
 
     public static void setEnabled(boolean enabled) {
         ENABLED = enabled;
+    }
+
+    public static boolean checkEnabled(@NotNull Server server) {
+        ENABLED = server.getPluginManager().getPlugin("PlaceholderAPI") != null;
+        return ENABLED;
     }
 
     @NotNull

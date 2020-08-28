@@ -3,6 +3,7 @@ package net.okocraft.scoreboard.display.board;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
+import net.okocraft.scoreboard.util.BukkitScoreboardManagerGetter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -26,7 +27,7 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
     public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
         super(plugin, player);
 
-        scoreboard = plugin.getScoreboardManager().getNewScoreboard();
+        scoreboard = BukkitScoreboardManagerGetter.get(plugin.getServer()).getNewScoreboard();
 
         this.title = new LineDisplay(player, board.getTitle(), 0);
 
@@ -63,7 +64,7 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
     @Override
     public void hideBoard() {
-        player.setScoreboard(plugin.getScoreboardManager().getMainScoreboard());
+        player.setScoreboard(BukkitScoreboardManagerGetter.get(plugin.getServer()).getMainScoreboard());
         cancelUpdateTasks();
     }
 

@@ -49,6 +49,8 @@ public abstract class AbstractUpdateTask implements UpdateTask {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
+                    waiting.set(false);
                 }
             }
         }

@@ -4,6 +4,8 @@ import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 public final class LengthChecker {
+
+    private final static int MAX_LIMIT = 64;
     private static int LIMIT = 64;
 
     @NotNull
@@ -41,7 +43,7 @@ public final class LengthChecker {
     }
 
     public static void setLimit(int limit) {
-        if (limit < 64) {
+        if (limit < MAX_LIMIT) {
             LIMIT = limit;
         }
     }

@@ -6,9 +6,12 @@ import net.okocraft.scoreboard.display.line.LineDisplay;
 import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractUpdateTask implements UpdateTask {
+
+    private static final long MILLISECONDS_PER_SECONDS = TimeUnit.SECONDS.toMillis(1);
 
     private final ScoreboardPlugin plugin;
 
@@ -45,7 +48,7 @@ public abstract class AbstractUpdateTask implements UpdateTask {
 
                 synchronized (waiting) {
                     try {
-                        waiting.wait(1000);
+                        waiting.wait(MILLISECONDS_PER_SECONDS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

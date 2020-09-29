@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public final class LengthChecker {
 
     private final static int MAX_LIMIT = 64;
-    private static int LIMIT = 64;
+    private static int LIMIT = MAX_LIMIT;
 
     @NotNull
     public static String check(@NotNull String str) {

@@ -3,7 +3,7 @@ package net.okocraft.scoreboard.task;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.display.board.BoardDisplay;
 import net.okocraft.scoreboard.display.line.LineDisplay;
-import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;

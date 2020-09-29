@@ -1,4 +1,4 @@
-package net.okocraft.scoreboard.papi;
+package net.okocraft.scoreboard.external;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Server;

@@ -1,7 +1,7 @@
 package net.okocraft.scoreboard.display.line;
 
 import net.okocraft.scoreboard.board.Line;
-import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.util.Colorizer;
 import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.ChatColor;

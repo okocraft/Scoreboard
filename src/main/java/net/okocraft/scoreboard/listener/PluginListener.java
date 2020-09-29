@@ -1,7 +1,7 @@
 package net.okocraft.scoreboard.listener;
 
 import net.okocraft.scoreboard.ScoreboardPlugin;
-import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;

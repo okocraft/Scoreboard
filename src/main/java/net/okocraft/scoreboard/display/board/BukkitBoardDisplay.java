@@ -2,7 +2,8 @@ package net.okocraft.scoreboard.display.board;
 
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
-import net.okocraft.scoreboard.display.line.DisplayedLine;
+import net.okocraft.scoreboard.display.line.LineDisplay;
+import net.okocraft.scoreboard.util.BukkitScoreboardManagerGetter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -15,29 +16,29 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
+public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
     private final Scoreboard scoreboard;
     private final Objective objective;
 
-    private final DisplayedLine title;
-    private final List<DisplayedLine> lines;
+    private final LineDisplay title;
+    private final List<LineDisplay> lines;
 
-    public BukkitDisplayedBoard(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
+    public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
         super(plugin, player);
 
-        scoreboard = plugin.getScoreboardManager().getNewScoreboard();
+        scoreboard = BukkitScoreboardManagerGetter.get(plugin.getServer()).getNewScoreboard();
 
-        this.title = new DisplayedLine(player, board.getTitle(), 0);
+        this.title = new LineDisplay(player, board.getTitle(), 0);
 
         objective = scoreboard.registerNewObjective("sb", "sb", title.getCurrentLine(), RenderType.INTEGER);
 
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        List<DisplayedLine> lines = new LinkedList<>();
+        this.lines = new LinkedList<>();
 
         for (int i = 0, l = board.getLines().size(), c = ChatColor.values().length; i < l && i < c; i++) {
-            DisplayedLine line = new DisplayedLine(player, board.getLines().get(i), i);
+            LineDisplay line = new LineDisplay(player, board.getLines().get(i), i);
 
             Team team = scoreboard.registerNewTeam(line.getTeamName());
 
@@ -48,10 +49,23 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
             objective.getScore(line.getEntryName()).setScore(l - i);
             lines.add(line);
         }
+    }
 
-        this.lines = List.copyOf(lines);
+    @Override
+    public boolean isVisible() {
+        return player.getScoreboard().equals(scoreboard);
+    }
 
+    @Override
+    public void showBoard() {
         player.setScoreboard(scoreboard);
+        scheduleUpdateTasks();
+    }
+
+    @Override
+    public void hideBoard() {
+        player.setScoreboard(BukkitScoreboardManagerGetter.get(plugin.getServer()).getMainScoreboard());
+        cancelUpdateTasks();
     }
 
     @Override
@@ -62,7 +76,7 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
     }
 
     @Override
-    public void applyLine(@NotNull DisplayedLine line) {
+    public void applyLine(@NotNull LineDisplay line) {
         if (line.isChanged()) {
             Team team = scoreboard.getTeam(line.getTeamName());
 
@@ -74,13 +88,13 @@ public class BukkitDisplayedBoard extends AbstractDisplayedBoard {
 
     @Override
     @NotNull
-    public DisplayedLine getTitle() {
+    public LineDisplay getTitle() {
         return title;
     }
 
     @Override
     @NotNull
-    public List<DisplayedLine> getLines() {
+    public List<LineDisplay> getLines() {
         return lines;
     }
 }

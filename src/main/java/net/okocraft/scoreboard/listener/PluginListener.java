@@ -1,6 +1,7 @@
 package net.okocraft.scoreboard.listener;
 
 import net.okocraft.scoreboard.ScoreboardPlugin;
+import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -29,10 +30,13 @@ public class PluginListener implements Listener {
     public void onEnable(@NotNull PluginEnableEvent event) {
         switch (event.getPlugin().getName()) {
             case "PlaceholderAPI":
-                plugin.checkPlaceholderAPI();
+                PlaceholderAPIHooker.setEnabled(true);
+                plugin.printPlaceholderIsAvailable();
                 return;
             case "ProtocolLib":
-                plugin.checkProtocolLib();
+                plugin.updateDisplayManager(true);
+                return;
+            default:
         }
     }
 
@@ -40,10 +44,12 @@ public class PluginListener implements Listener {
     public void onDisable(@NotNull PluginDisableEvent event) {
         switch (event.getPlugin().getName()) {
             case "PlaceholderAPI":
-                plugin.checkPlaceholderAPI();
+                PlaceholderAPIHooker.setEnabled(false);
                 return;
             case "ProtocolLib":
-                plugin.checkProtocolLib();
+                plugin.updateDisplayManager(false);
+                return;
+            default:
         }
     }
 }

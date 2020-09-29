@@ -5,7 +5,7 @@ import net.okocraft.scoreboard.board.Line;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PacketDisplayedLine extends DisplayedLine {
+public class PacketLineDisplay extends LineDisplay {
 
     private final String id;
     private final WrappedChatComponent teamNameComponent;
@@ -13,7 +13,7 @@ public class PacketDisplayedLine extends DisplayedLine {
 
     private final int score;
 
-    public PacketDisplayedLine(@NotNull Player player, @NotNull Line line, int num, int score) {
+    public PacketLineDisplay(@NotNull Player player, @NotNull Line line, int num, int score) {
         super(player, line, num);
 
         this.id = Long.toHexString(System.nanoTime());

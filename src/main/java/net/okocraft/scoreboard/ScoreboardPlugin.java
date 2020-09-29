@@ -1,12 +1,17 @@
 package net.okocraft.scoreboard;
 
+import net.okocraft.scoreboard.config.BoardManager;
+import net.okocraft.scoreboard.config.Configuration;
+import net.okocraft.scoreboard.display.manager.BukkitDisplayManager;
+import net.okocraft.scoreboard.display.manager.DisplayManager;
+import net.okocraft.scoreboard.display.manager.PacketDisplayManager;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
-import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.external.ProtocolLibChecker;
 import net.okocraft.scoreboard.task.UpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.ScoreboardManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutorService;
@@ -17,31 +22,31 @@ import java.util.concurrent.TimeUnit;
 
 public class ScoreboardPlugin extends JavaPlugin {
 
-    private ScoreboardManager scoreboardManager;
+    private static final long MILLISECONDS_PER_TICK = 50;
+
+    private Configuration config;
+
     private BoardManager boardManager;
+    private DisplayManager displayManager;
     private PlayerListener playerListener;
     private PluginListener pluginListener;
+
     private ExecutorService executor;
     private ScheduledExecutorService scheduler;
-    private boolean useProtocolLib;
+
+    @Override
+    public void onLoad() {
+        config = new Configuration(this);
+
+        LengthChecker.setLimit(config.getLengthLimit());
+
+        executor = Executors.newFixedThreadPool(config.getThreads());
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        reloadConfig();
-
-        executor = Executors.newFixedThreadPool(Math.max(1, getConfig().getInt("board.threads", 5)));
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-
-        try {
-            boardManager = new BoardManager(this);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        LengthChecker.setLimit(Math.max(getConfig().getInt("board.limit", 32), 1));
+        boardManager = new BoardManager(this);
 
         playerListener = new PlayerListener(this);
         playerListener.register();
@@ -49,15 +54,17 @@ public class ScoreboardPlugin extends JavaPlugin {
         pluginListener = new PluginListener(this);
         pluginListener.register();
 
-        getServer().getScheduler().runTaskLater(this, this::checkPlaceholderAPI, 1);
-        getServer().getScheduler().runTaskLater(this, this::checkProtocolLib, 1);
-        getServer().getScheduler().runTaskLater(this, boardManager::showAllDefault, 2);
+        updateDisplayManager(ProtocolLibChecker.checkEnabled(getServer()));
+
+        if (PlaceholderAPIHooker.checkEnabled(getServer())) {
+            printPlaceholderIsAvailable();
+        }
     }
 
     @Override
     public void onDisable() {
-        if (boardManager != null) {
-            boardManager.removeAll();
+        if (displayManager != null) {
+            displayManager.hideAllBoards();
         }
 
         if (playerListener != null) {
@@ -78,19 +85,6 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     @NotNull
-    public ScoreboardManager getScoreboardManager() {
-        if (scoreboardManager == null) {
-            scoreboardManager = getServer().getScoreboardManager();
-        }
-
-        if (scoreboardManager == null) {
-            throw new IllegalStateException();
-        }
-
-        return scoreboardManager;
-    }
-
-    @NotNull
     public BoardManager getBoardManager() {
         if (boardManager == null) {
             throw new IllegalStateException();
@@ -99,39 +93,43 @@ public class ScoreboardPlugin extends JavaPlugin {
         return boardManager;
     }
 
-    @NotNull
-    public ExecutorService getExecutor() {
-        return executor;
+    public DisplayManager getDisplayManager() {
+        if (boardManager == null) {
+            throw new IllegalStateException();
+        }
+
+        return displayManager;
+    }
+
+    public void runAsync(@NotNull Runnable runnable) {
+        executor.submit(runnable);
     }
 
     @NotNull
     public ScheduledFuture<?> scheduleUpdateTask(@NotNull UpdateTask task, long tick) {
-        long interval = tick * 50;
-        return scheduler.scheduleWithFixedDelay(() -> executor.submit(task), interval, interval, TimeUnit.MILLISECONDS);
+        long interval = tick * MILLISECONDS_PER_TICK;
+        return scheduler.scheduleWithFixedDelay(() -> runAsync(task), interval, interval, TimeUnit.MILLISECONDS);
     }
 
-    public void checkPlaceholderAPI() {
-        PlaceholderAPIHooker.setEnabled(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null);
+    public void updateDisplayManager(boolean isEnabledProtocolLib) {
+        boolean useProtocolLib = config.isUsingProtocolLib() && isEnabledProtocolLib;
 
-        if (PlaceholderAPIHooker.isEnabled()) {
-            getLogger().info("PlaceholderAPI is available!");
+        if (displayManager != null && displayManager.isUsingProtocolLib() == useProtocolLib) {
+            return;
         }
-    }
-
-    public void checkProtocolLib() {
-        useProtocolLib = getServer().getPluginManager().getPlugin("ProtocolLib") != null && getConfig().getBoolean("use-ProtocolLib", true);
 
         if (useProtocolLib) {
+            displayManager = new PacketDisplayManager(this);
             getLogger().info("We are using ProtocolLib.");
         } else {
+            displayManager = new BukkitDisplayManager(this);
             getLogger().info("We are using Bukkit's Scoreboard.");
         }
 
-        boardManager.removeAll();
-        boardManager.showAllDefault();
+        getServer().getOnlinePlayers().forEach(displayManager::showDefaultBoard);
     }
 
-    boolean isUsingProtocolLib() {
-        return useProtocolLib;
+    public void printPlaceholderIsAvailable() {
+        getLogger().info("PlaceholderAPI is available!");
     }
 }

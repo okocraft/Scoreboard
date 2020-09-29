@@ -4,11 +4,17 @@ import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 public final class LengthChecker {
-    private static int LIMIT = 64;
+
+    private static final int MAX_LIMIT = 64;
+    private static int lengthLimit = MAX_LIMIT;
+
+    private LengthChecker() {
+        throw new UnsupportedOperationException();
+    }
 
     @NotNull
     public static String check(@NotNull String str) {
-        if (LIMIT < ChatColor.stripColor(str).length()) {
+        if (lengthLimit < ChatColor.stripColor(str).length()) {
 
             boolean bool = false;
             int colors = 0;
@@ -29,7 +35,7 @@ public final class LengthChecker {
 
                 length++;
 
-                if (LIMIT < length) {
+                if (lengthLimit < length) {
                     break;
                 }
             }
@@ -41,8 +47,8 @@ public final class LengthChecker {
     }
 
     public static void setLimit(int limit) {
-        if (limit < 64) {
-            LIMIT = limit;
+        if (limit < MAX_LIMIT) {
+            lengthLimit = limit;
         }
     }
 }

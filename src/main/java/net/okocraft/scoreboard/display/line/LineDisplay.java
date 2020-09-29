@@ -1,7 +1,7 @@
 package net.okocraft.scoreboard.display.line;
 
 import net.okocraft.scoreboard.board.Line;
-import net.okocraft.scoreboard.papi.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.util.Colorizer;
 import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.ChatColor;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
-public class DisplayedLine {
+public class LineDisplay {
 
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("[%]([^%]+)[%]");
 
@@ -24,7 +24,7 @@ public class DisplayedLine {
 
     private int currentIndex = 0;
 
-    public DisplayedLine(@NotNull Player player, @NotNull Line line, int num) {
+    public LineDisplay(@NotNull Player player, @NotNull Line line, int num) {
         this.player = player;
         this.line = line;
         this.teamName = String.valueOf(num);

@@ -53,10 +53,16 @@ public abstract class AbstractBoardDisplay implements BoardDisplay {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AbstractBoardDisplay)) return false;
-        AbstractBoardDisplay that = (AbstractBoardDisplay) o;
-        return player.equals(that.player);
+        if (this == o) {
+            return true;
+        }
+
+        if (o instanceof AbstractBoardDisplay) {
+            AbstractBoardDisplay that = (AbstractBoardDisplay) o;
+            return player.equals(that.player);
+        } else {
+            return false;
+        }
     }
 
     @Override

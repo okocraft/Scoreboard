@@ -35,6 +35,8 @@ public class PluginListener implements Listener {
                 return;
             case "ProtocolLib":
                 plugin.updateDisplayManager(true);
+                return;
+            default:
         }
     }
 
@@ -46,6 +48,8 @@ public class PluginListener implements Listener {
                 return;
             case "ProtocolLib":
                 plugin.updateDisplayManager(false);
+                return;
+            default:
         }
     }
 }

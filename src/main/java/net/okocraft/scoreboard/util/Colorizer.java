@@ -9,6 +9,10 @@ public final class Colorizer {
     private final static char X = 'x';
     private final static String COLOR_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRr";
 
+    private Colorizer() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Colorize given string. (convert to minecraft 1.16+ color format)
      * <p>

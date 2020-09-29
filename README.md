@@ -1,8 +1,16 @@
+# Scoreboard
+
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/okocraft/Scoreboard)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/okocraft/Scoreboard/Java%20CI)
 ![GitHub](https://img.shields.io/github/license/okocraft/Scoreboard)
 
-# Scoreboard
+master: 
+![Java CI](https://github.com/okocraft/Scoreboard/workflows/Java%20CI/badge.svg?branch=master)
+![Lint Code Base](https://github.com/okocraft/Scoreboard/workflows/Lint%20Code%20Base/badge.svg?branch=master)
+
+develop:
+master: 
+![Java CI](https://github.com/okocraft/Scoreboard/workflows/Java%20CI/badge.svg?branch=develop)
+![Lint Code Base](https://github.com/okocraft/Scoreboard/workflows/Lint%20Code%20Base/badge.svg?branch=develop)
 
 ゲーム画面の右側にカスタマイズしたスコアボードを表示する Spigot プラグインです。
 

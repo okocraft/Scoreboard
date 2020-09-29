@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class Configuration {
 
+    private final static int DEFAULT_BOARD_LIMIT = 32;
+    private final static int DEFAULT_THREADS = 5;
+
     private final BukkitConfig config;
 
     public Configuration(@NotNull ScoreboardPlugin plugin) {
@@ -17,10 +20,10 @@ public class Configuration {
     }
 
     public int getLengthLimit() {
-        return Math.max(config.getInt("board.limit", 32), 1);
+        return Math.max(config.getInt("board.limit", DEFAULT_BOARD_LIMIT), 1);
     }
 
     public int getThreads() {
-        return Math.max(config.getInt("board.threads", 5), 1);
+        return Math.max(config.getInt("board.threads", DEFAULT_THREADS), 1);
     }
 }

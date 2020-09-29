@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
 public final class LengthChecker {
 
     private final static int MAX_LIMIT = 64;
-    private static int LIMIT = MAX_LIMIT;
+    private static int lengthLimit = MAX_LIMIT;
 
     @NotNull
     public static String check(@NotNull String str) {
-        if (LIMIT < ChatColor.stripColor(str).length()) {
+        if (lengthLimit < ChatColor.stripColor(str).length()) {
 
             boolean bool = false;
             int colors = 0;
@@ -31,7 +31,7 @@ public final class LengthChecker {
 
                 length++;
 
-                if (LIMIT < length) {
+                if (lengthLimit < length) {
                     break;
                 }
             }
@@ -44,7 +44,7 @@ public final class LengthChecker {
 
     public static void setLimit(int limit) {
         if (limit < MAX_LIMIT) {
-            LIMIT = limit;
+            lengthLimit = limit;
         }
     }
 }

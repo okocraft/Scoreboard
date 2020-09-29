@@ -9,6 +9,10 @@ public final class PlaceholderAPIHooker {
 
     private static boolean enabled;
 
+    private PlaceholderAPIHooker() {
+        throw new UnsupportedOperationException();
+    }
+
     public static boolean isEnabled() {
         return enabled;
     }

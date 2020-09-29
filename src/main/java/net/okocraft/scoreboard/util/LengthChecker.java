@@ -8,6 +8,10 @@ public final class LengthChecker {
     private static final int MAX_LIMIT = 64;
     private static int lengthLimit = MAX_LIMIT;
 
+    private LengthChecker() {
+        throw new UnsupportedOperationException();
+    }
+
     @NotNull
     public static String check(@NotNull String str) {
         if (lengthLimit < ChatColor.stripColor(str).length()) {

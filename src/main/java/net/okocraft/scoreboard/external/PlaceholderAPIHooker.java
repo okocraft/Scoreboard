@@ -7,24 +7,24 @@ import org.jetbrains.annotations.NotNull;
 
 public final class PlaceholderAPIHooker {
 
-    private static boolean ENABLED;
+    private static boolean enabled;
 
     public static boolean isEnabled() {
-        return ENABLED;
+        return enabled;
     }
 
     public static void setEnabled(boolean enabled) {
-        ENABLED = enabled;
+        PlaceholderAPIHooker.enabled = enabled;
     }
 
     public static boolean checkEnabled(@NotNull Server server) {
-        ENABLED = server.getPluginManager().getPlugin("PlaceholderAPI") != null;
-        return ENABLED;
+        enabled = server.getPluginManager().getPlugin("PlaceholderAPI") != null;
+        return enabled;
     }
 
     @NotNull
     public static String run(@NotNull Player player, @NotNull String str) {
-        if (ENABLED) {
+        if (enabled) {
             return PlaceholderAPI.setPlaceholders(player, str);
         } else {
             return str;

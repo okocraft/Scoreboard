@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class Configuration {
 
-    private final static int DEFAULT_BOARD_LIMIT = 32;
-    private final static int DEFAULT_THREADS = 5;
+    private static final int DEFAULT_BOARD_LIMIT = 32;
+    private static final int DEFAULT_THREADS = 5;
 
     private final BukkitConfig config;
 

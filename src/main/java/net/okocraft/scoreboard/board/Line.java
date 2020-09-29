@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Line {
-    public final static Line EMPTY = new Line(Collections.emptyList(), 0);
+    public static final Line EMPTY = new Line(Collections.emptyList(), 0);
 
     private final List<String> lines;
     private final long interval;

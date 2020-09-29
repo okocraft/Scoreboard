@@ -23,9 +23,9 @@ import java.util.logging.Level;
 
 public class PacketBoardDisplay extends AbstractBoardDisplay {
 
-    private final static WrappedChatComponent SUFFIX = WrappedChatComponent.fromText(ChatColor.RESET.toString());
-    private final static String ALWAYS = "always";
-    private final static Class<?> ENUM_CHAT_FORMAT = MinecraftReflection.getMinecraftClass("EnumChatFormat");
+    private static final WrappedChatComponent SUFFIX = WrappedChatComponent.fromText(ChatColor.RESET.toString());
+    private static final String ALWAYS = "always";
+    private static final Class<?> ENUM_CHAT_FORMAT = MinecraftReflection.getMinecraftClass("EnumChatFormat");
 
     private final PacketContainer objectivePacket;
 

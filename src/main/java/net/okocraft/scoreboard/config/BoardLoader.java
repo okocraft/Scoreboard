@@ -39,7 +39,7 @@ public final class BoardLoader {
         Board board = load(new BukkitConfig(plugin, DEFAULT_BOARD_FILE_NAME, true));
 
         if (board == null) {
-            throw new IllegalStateException("Could not load default board ("+ DEFAULT_BOARD_FILE_NAME +")");
+            throw new IllegalStateException("Could not load default board (" + DEFAULT_BOARD_FILE_NAME + ")");
         } else {
             return board;
         }

@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ScoreboardPlugin extends JavaPlugin {
 
+    private static final long MILLISECONDS_PER_TICK = 50;
+
     private Configuration config;
 
     private BoardManager boardManager;
@@ -105,7 +107,7 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @NotNull
     public ScheduledFuture<?> scheduleUpdateTask(@NotNull UpdateTask task, long tick) {
-        long interval = tick * 50;
+        long interval = tick * MILLISECONDS_PER_TICK;
         return scheduler.scheduleWithFixedDelay(() -> runAsync(task), interval, interval, TimeUnit.MILLISECONDS);
     }
 

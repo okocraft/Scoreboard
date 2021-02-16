@@ -33,34 +33,26 @@ public abstract class AbstractUpdateTask implements UpdateTask {
         }
 
         if (PlaceholderAPIHooker.isEnabled() && line.hasPlaceholders()) {
-            AtomicBoolean waiting = new AtomicBoolean(false);
-            AtomicBoolean replaced = new AtomicBoolean(false);
+            var waiting = new AtomicBoolean();
 
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(
                     plugin,
                     () -> {
                         line.runPlaceholderApi();
-                        replaced.set(true);
 
-                        if (waiting.get()) {
-                            synchronized (waiting) {
-                                waiting.notify();
+                        synchronized (waiting) {
+                            if (waiting.get()) {
+                                waiting.notifyAll();
                             }
                         }
                     }
             );
 
-            if (!replaced.get()) {
-                waiting.set(true);
-
-                synchronized (waiting) {
-                    try {
-                        waiting.wait(MILLISECONDS_PER_SECONDS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    waiting.set(false);
+            synchronized (waiting) {
+                try {
+                    waiting.set(true);
+                    waiting.wait(MILLISECONDS_PER_SECONDS);
+                } catch (InterruptedException ignored) {
                 }
             }
         }

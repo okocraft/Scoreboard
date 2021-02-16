@@ -28,20 +28,27 @@ public abstract class AbstractUpdateTask implements UpdateTask {
     public void run() {
         line.update();
 
+        if (line.hasPlaceholders()) {
+            line.replacePlaceholders();
+        }
+
         if (PlaceholderAPIHooker.isEnabled() && line.hasPlaceholders()) {
             AtomicBoolean waiting = new AtomicBoolean(false);
             AtomicBoolean replaced = new AtomicBoolean(false);
 
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                line.replacePlaceholders();
-                replaced.set(true);
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(
+                    plugin,
+                    () -> {
+                        line.runPlaceholderApi();
+                        replaced.set(true);
 
-                if (waiting.get()) {
-                    synchronized (waiting) {
-                        waiting.notify();
+                        if (waiting.get()) {
+                            synchronized (waiting) {
+                                waiting.notify();
+                            }
+                        }
                     }
-                }
-            });
+            );
 
             if (!replaced.get()) {
                 waiting.set(true);

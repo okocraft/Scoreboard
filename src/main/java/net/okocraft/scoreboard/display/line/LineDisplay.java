@@ -1,6 +1,7 @@
 package net.okocraft.scoreboard.display.line;
 
 import net.okocraft.scoreboard.board.Line;
+import net.okocraft.scoreboard.display.placeholder.Placeholders;
 import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.util.Colorizer;
 import net.okocraft.scoreboard.util.LengthChecker;
@@ -59,6 +60,10 @@ public class LineDisplay {
     }
 
     public void replacePlaceholders() {
+        currentLine = Placeholders.replace(player, currentLine);
+    }
+
+    public void runPlaceholderApi() {
         currentLine = PlaceholderAPIHooker.run(player, currentLine);
     }
 

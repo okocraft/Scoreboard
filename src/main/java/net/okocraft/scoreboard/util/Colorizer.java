@@ -3,12 +3,13 @@ package net.okocraft.scoreboard.util;
 import org.jetbrains.annotations.NotNull;
 
 public final class Colorizer {
+
     private static final char COLOR_MARK = '&';
-    private static final char COLOR_CHAR = '§';
+    private static final String COLOR_MARK_STRING = String.valueOf(COLOR_MARK);
+    private static final char COLOR_SECTION = '§';
+    private static final String COLOR_SECTION_STRING = String.valueOf(COLOR_SECTION);
     private static final char HEX_MARK = '#';
     private static final char X = 'x';
-    private static final int HEX_COLOR_CODE_LENGTH = 7;
-    private static final int HEXADECIMAL = 16;
     private static final String COLOR_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRr";
 
     private Colorizer() {
@@ -25,69 +26,57 @@ public final class Colorizer {
      */
     @NotNull
     public static String colorize(String str) {
-        if (str == null) {
+        if (str == null || str.isEmpty()) {
             return "";
         }
 
-        char[] b = str.toCharArray();
-        StringBuilder builder = new StringBuilder();
+        if (str.contains(COLOR_MARK_STRING)) {
+            StringBuilder builder = new StringBuilder(str);
 
-        for (int i = 0; i < b.length; i++) {
-            if (b[i] != COLOR_MARK || b.length == i + 1) {
-                builder.append(b[i]);
-                continue;
+            int i = builder.indexOf(COLOR_MARK_STRING);
+
+            if (i == -1) {
+                return builder.toString();
             }
 
-            int next = i + 1;
+            int l = builder.length();
 
-            if (b[next] == HEX_MARK) {
-                if (i + HEX_COLOR_CODE_LENGTH < b.length) {
-                    try {
-                        addMcColor(str.substring(next, next + HEX_COLOR_CODE_LENGTH), builder);
-                        i += HEX_COLOR_CODE_LENGTH;
-                        continue;
-                    } catch (IllegalArgumentException ignored) {
+            while (i != -1 && i + 1 < l) {
+                if (builder.charAt(i + 1) == HEX_MARK) {
+                    if (i + 7 < l) {
+                        String hex = builder.substring(i + 2, i + 8);
+
+                        try {
+                            Integer.parseInt(hex, 16);
+                        } catch (NumberFormatException e) {
+                            i = builder.indexOf(COLOR_MARK_STRING, i + 1);
+                            continue;
+                        }
+
+                        builder.setCharAt(i, COLOR_SECTION);
+                        builder.setCharAt(i + 1, X);
+
+                        for (int j = i + 7; j != i + 1; j--) {
+                            builder.insert(j, COLOR_SECTION_STRING);
+                        }
+
+                        l = builder.length();
                     }
+
+                    i = builder.indexOf(COLOR_MARK_STRING, i + 1);
+                    continue;
                 }
 
-                builder.append(b[i]).append(b[next]);
-                i++;
-                continue;
+                if (-1 < COLOR_CODES.indexOf(builder.charAt(i + 1))) {
+                    builder.setCharAt(i, COLOR_SECTION);
+                }
+
+                i = builder.indexOf(COLOR_MARK_STRING, i + 1);
             }
 
-            if (-1 < COLOR_CODES.indexOf(b[next])) {
-                builder.append(COLOR_CHAR).append(Character.toLowerCase(b[next]));
-                i++;
-            } else {
-                builder.append(b[i]);
-            }
+            return builder.toString();
+        } else {
+            return str;
         }
-
-        return builder.toString();
-    }
-
-    private static void addMcColor(String hex, StringBuilder builder) throws IllegalArgumentException {
-        char[] array = hex.toCharArray();
-
-        if (array.length != HEX_COLOR_CODE_LENGTH) {
-            throw new IllegalArgumentException("hex must be 7 characters.");
-        }
-
-        if (array[0] != HEX_MARK) {
-            throw new IllegalArgumentException("hex must start with #");
-        }
-
-        try {
-            Integer.parseInt(hex.substring(1), HEXADECIMAL);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Could not parse hex: " + hex, e);
-        }
-
-        builder.append(COLOR_CHAR).append(X);
-
-        for (char c : hex.substring(1).toCharArray()) {
-            builder.append(COLOR_CHAR).append(c);
-        }
-
     }
 }

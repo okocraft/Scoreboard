@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -13,9 +12,6 @@ public final class Placeholders {
 
     private static final Object SERVER;
     private static final Field TPS_FIELD;
-
-    private static Method PLAYER_GET_HANDLE;
-    private static Field PLAYER_PING;
 
     static {
         try {
@@ -54,7 +50,7 @@ public final class Placeholders {
         }
 
         if (line.contains("%player_ping%")) {
-            var value = getPing(p);
+            var value = p.getPing();
             line = line.replace("%player_ping%", Integer.toString(value));
         }
 
@@ -72,34 +68,5 @@ public final class Placeholders {
             e.printStackTrace();
             return 0;
         }
-    }
-
-    private static int getPing(@NotNull Player player) {
-        if (PLAYER_PING == null) {
-            try {
-                cacheReflection(player);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return -1;
-            }
-        }
-
-        try {
-            var minecraftPlayer = PLAYER_GET_HANDLE.invoke(player);
-            return PLAYER_PING.getInt(minecraftPlayer);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    private static void cacheReflection(Player player) throws Throwable {
-        PLAYER_GET_HANDLE = player.getClass().getDeclaredMethod("getHandle");
-        PLAYER_GET_HANDLE.setAccessible(true);
-
-        var minecraftPlayer = PLAYER_GET_HANDLE.invoke(player);
-
-        PLAYER_PING = minecraftPlayer.getClass().getDeclaredField("ping");
-        PLAYER_PING.setAccessible(true);
     }
 }

@@ -1,11 +1,9 @@
 package net.okocraft.scoreboard.config;
 
-import com.github.siroshun09.configapi.bukkit.BukkitYaml;
-import com.github.siroshun09.configapi.bukkit.BukkitYamlFactory;
+import com.github.siroshun09.configapi.yaml.YamlConfiguration;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.board.Line;
-import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -15,7 +13,9 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public final class BoardLoader {
@@ -33,7 +33,15 @@ public final class BoardLoader {
 
     @NotNull
     public static Board loadDefaultBoard(@NotNull ScoreboardPlugin plugin) throws IllegalStateException {
-        return getBoard(BukkitYamlFactory.loadUnsafe(plugin, DEFAULT_BOARD_FILE_NAME));
+        var yaml = YamlConfiguration.create(plugin.getDataFolder().toPath().resolve("default.yml"));
+
+        try {
+            yaml.load();
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not load default.yml", e);
+        }
+
+        return getBoard(yaml);
     }
 
     @NotNull
@@ -47,7 +55,16 @@ public final class BoardLoader {
                         .filter(Files::isRegularFile)
                         .filter(Files::isReadable)
                         .filter(p -> !p.toString().endsWith(DEFAULT_BOARD_FILE_NAME))
-                        .map(BukkitYamlFactory::loadUnsafe)
+                        .map(YamlConfiguration::create)
+                        .map(yaml -> {
+                            try {
+                                yaml.load();
+                                return yaml;
+                            } catch (IOException ignored) {
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull)
                         .map(BoardLoader::getBoard)
                         .collect(Collectors.toUnmodifiableSet());
             } catch (IOException e) {
@@ -63,7 +80,7 @@ public final class BoardLoader {
         }
     }
 
-    private static @NotNull Board getBoard(@NotNull BukkitYaml yaml) {
+    private static @NotNull Board getBoard(@NotNull YamlConfiguration yaml) {
         List<String> titleList = yaml.getStringList(PATH_TITLE + PATH_LIST_SUFFIX);
         Line title;
 
@@ -73,7 +90,7 @@ public final class BoardLoader {
             title = new Line(titleList, yaml.getLong(PATH_TITLE + PATH_INTERVAL_SUFFIX));
         }
 
-        ConfigurationSection section = yaml.getConfig().getConfigurationSection(PATH_LINE);
+        var section = yaml.getSection(PATH_LINE);
 
         List<Line> lines;
 
@@ -82,7 +99,7 @@ public final class BoardLoader {
         } else {
             lines = new LinkedList<>();
 
-            for (String root : section.getKeys(false)) {
+            for (String root : section.getKeys()) {
                 List<String> lineList = section.getStringList(root + PATH_LIST_SUFFIX);
 
                 if (lineList.isEmpty()) {

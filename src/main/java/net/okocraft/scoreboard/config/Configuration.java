@@ -1,6 +1,6 @@
 package net.okocraft.scoreboard.config;
 
-import com.github.siroshun09.configapi.common.util.ResourceUtils;
+import com.github.siroshun09.configapi.api.util.ResourceUtils;
 import com.github.siroshun09.configapi.yaml.YamlConfiguration;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import org.jetbrains.annotations.NotNull;

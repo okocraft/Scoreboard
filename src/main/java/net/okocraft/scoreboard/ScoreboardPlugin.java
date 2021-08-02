@@ -58,6 +58,8 @@ public class ScoreboardPlugin extends JavaPlugin {
         if (PlaceholderAPIHooker.checkEnabled(getServer())) {
             printPlaceholderIsAvailable();
         }
+
+        runAsync(() -> getServer().getOnlinePlayers().forEach(displayManager::showDefaultBoard));
     }
 
     @Override

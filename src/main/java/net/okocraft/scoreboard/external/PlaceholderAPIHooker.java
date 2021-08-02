@@ -28,7 +28,7 @@ public final class PlaceholderAPIHooker {
 
     @NotNull
     public static String run(@NotNull Player player, @NotNull String str) {
-        if (enabled) {
+        if (enabled && !str.isEmpty()) {
             return PlaceholderAPI.setPlaceholders(player, str);
         } else {
             return str;

@@ -57,11 +57,11 @@ public class LineDisplay {
 
         var temp = line.get(currentIndex);
 
-        if (hasPlaceholders()) {
+        if (hasPlaceholders(temp)) {
             temp = Placeholders.replace(player, temp);
         }
 
-        if (PlaceholderAPIHooker.isEnabled() && hasPlaceholders()) {
+        if (PlaceholderAPIHooker.isEnabled() && hasPlaceholders(temp)) {
             temp = PlaceholderAPIHooker.run(player, temp);
         }
 
@@ -87,7 +87,7 @@ public class LineDisplay {
         return line.getInterval();
     }
 
-    private boolean hasPlaceholders() {
-        return PLACEHOLDER_PATTERN.matcher(currentLine.content()).find();
+    private boolean hasPlaceholders(@NotNull String str) {
+        return str.indexOf('%') != -1 && PLACEHOLDER_PATTERN.matcher(str).find();
     }
 }

@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class ScoreboardPlugin extends JavaPlugin {
 
@@ -102,7 +103,13 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     public void runAsync(@NotNull Runnable runnable) {
-        executor.submit(runnable);
+        executor.submit(() -> {
+            try {
+                runnable.run();
+            } catch (Throwable e) {
+                getLogger().log(Level.SEVERE, null, e);
+            }
+        });
     }
 
     @NotNull

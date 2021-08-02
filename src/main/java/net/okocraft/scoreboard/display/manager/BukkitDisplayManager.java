@@ -18,9 +18,4 @@ public class BukkitDisplayManager extends AbstractDisplayManager {
     protected BoardDisplay newDisplay(@NotNull Player player, @NotNull Board board) {
         return new BukkitBoardDisplay(plugin, board, player);
     }
-
-    @Override
-    public boolean isUsingProtocolLib() {
-        return false;
-    }
 }

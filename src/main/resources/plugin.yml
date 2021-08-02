@@ -3,4 +3,4 @@ main: net.okocraft.scoreboard.ScoreboardPlugin
 version: ${project.version}
 api-version: "1.17"
 author: Siroshun09
-softdepend: [PlaceholderAPI, ProtocolLib]
+softdepend: [PlaceholderAPI]

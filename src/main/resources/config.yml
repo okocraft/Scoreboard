@@ -1,4 +1,3 @@
 board:
   limit: 32
   threads: 5
-use-ProtocolLib: true

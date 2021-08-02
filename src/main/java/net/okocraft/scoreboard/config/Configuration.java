@@ -30,10 +30,6 @@ public class Configuration {
         }
     }
 
-    public boolean isUsingProtocolLib() {
-        return config.getBoolean("use-ProtocolLib", true);
-    }
-
     public int getLengthLimit() {
         return Math.max(config.getInteger("board.limit", DEFAULT_BOARD_LIMIT), 1);
     }

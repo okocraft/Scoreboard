@@ -18,13 +18,12 @@ develop:
 - Java 11+
 - Spigot 1.15+
 - (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
-- (Optional) [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
 
 ## Usage
 
 サーバーディレクトリの `/plugins/` に配置し、サーバーを再起動する。
 
-`config.yml` で表示される文字数の制限と ProtocolLib の使用、`default.yml` でボードの表示設定ができます。
+`config.yml` で表示される文字数の制限、`default.yml` でボードの表示設定ができます。
 
 ```yaml
 # default.yml 設定例

@@ -4,11 +4,9 @@ import net.okocraft.scoreboard.config.BoardManager;
 import net.okocraft.scoreboard.config.Configuration;
 import net.okocraft.scoreboard.display.manager.BukkitDisplayManager;
 import net.okocraft.scoreboard.display.manager.DisplayManager;
-import net.okocraft.scoreboard.display.manager.PacketDisplayManager;
+import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
-import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
-import net.okocraft.scoreboard.external.ProtocolLibChecker;
 import net.okocraft.scoreboard.task.UpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,7 +53,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         pluginListener = new PluginListener(this);
         pluginListener.register();
 
-        updateDisplayManager(ProtocolLibChecker.checkEnabled(getServer()));
+        displayManager = new BukkitDisplayManager(this);
 
         if (PlaceholderAPIHooker.checkEnabled(getServer())) {
             printPlaceholderIsAvailable();
@@ -116,24 +114,6 @@ public class ScoreboardPlugin extends JavaPlugin {
     public ScheduledFuture<?> scheduleUpdateTask(@NotNull UpdateTask task, long tick) {
         long interval = tick * MILLISECONDS_PER_TICK;
         return scheduler.scheduleWithFixedDelay(() -> runAsync(task), interval, interval, TimeUnit.MILLISECONDS);
-    }
-
-    public void updateDisplayManager(boolean isEnabledProtocolLib) {
-        boolean useProtocolLib = config.isUsingProtocolLib() && isEnabledProtocolLib;
-
-        if (displayManager != null && displayManager.isUsingProtocolLib() == useProtocolLib) {
-            return;
-        }
-
-        if (useProtocolLib) {
-            displayManager = new PacketDisplayManager(this);
-            getLogger().info("We are using ProtocolLib.");
-        } else {
-            displayManager = new BukkitDisplayManager(this);
-            getLogger().info("We are using Bukkit's Scoreboard.");
-        }
-
-        getServer().getOnlinePlayers().forEach(displayManager::showDefaultBoard);
     }
 
     public void printPlaceholderIsAvailable() {

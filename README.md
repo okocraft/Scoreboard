@@ -5,18 +5,16 @@
 
 master:
 ![Java CI](https://github.com/okocraft/Scoreboard/workflows/Java%20CI/badge.svg?branch=master)
-![Lint Code Base](https://github.com/okocraft/Scoreboard/workflows/Lint%20Code%20Base/badge.svg?branch=master)
 
 develop:
 ![Java CI](https://github.com/okocraft/Scoreboard/workflows/Java%20CI/badge.svg?branch=develop)
-![Lint Code Base](https://github.com/okocraft/Scoreboard/workflows/Lint%20Code%20Base/badge.svg?branch=develop)
 
 ゲーム画面の右側にカスタマイズしたスコアボードを表示する Spigot プラグインです。
 
 ## Requirements
 
 - Java 11+
-- Spigot 1.15+
+- Paper 1.17+
 - (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 
 ## Usage

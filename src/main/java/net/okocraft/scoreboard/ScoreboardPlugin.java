@@ -9,9 +9,11 @@ import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
 import net.okocraft.scoreboard.task.UpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,6 +25,11 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     private static final long MILLISECONDS_PER_TICK = 50;
 
+    private static ScoreboardPlugin INSTANCE;
+
+    public static @NotNull Plugin getPlugin() {
+        return Objects.requireNonNull(INSTANCE);
+    }
     private Configuration config;
 
     private BoardManager boardManager;
@@ -35,6 +42,8 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        INSTANCE = this;
+
         config = new Configuration(this);
 
         LengthChecker.setLimit(config.getLengthLimit());

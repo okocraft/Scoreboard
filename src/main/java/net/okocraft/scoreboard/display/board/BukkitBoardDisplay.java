@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -42,11 +43,13 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
             Team team = scoreboard.registerNewTeam(line.getName());
 
-            team.addEntry(line.getName());
+            var entryName = ChatColor.values()[i].toString();
+
+            team.addEntry(entryName);
             team.prefix(line.getCurrentLine());
             team.suffix(Component.empty());
 
-            objective.getScore(line.getName()).setScore(l - i);
+            objective.getScore(entryName).setScore(l - i);
             lines.add(line);
         }
     }

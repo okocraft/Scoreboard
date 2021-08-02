@@ -1,9 +1,9 @@
 package net.okocraft.scoreboard.display.board;
 
+import net.kyori.adventure.text.Component;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -23,10 +23,11 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
     private final LineDisplay title;
     private final List<LineDisplay> lines;
 
-    public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board, @NotNull Player player) {
+    public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board,
+                              @NotNull Player player, @NotNull Scoreboard scoreboard) {
         super(plugin, player);
 
-        scoreboard = plugin.getServer().getScoreboardManager().getNewScoreboard();
+        this.scoreboard = scoreboard;
 
         this.title = new LineDisplay(player, board.getTitle(), 0);
 
@@ -36,16 +37,16 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
         this.lines = new LinkedList<>();
 
-        for (int i = 0, l = board.getLines().size(), c = ChatColor.values().length; i < l && i < c; i++) {
+        for (int i = 0, l = board.getLines().size(); i < l && i < 16; i++) {
             LineDisplay line = new LineDisplay(player, board.getLines().get(i), i);
 
-            Team team = scoreboard.registerNewTeam(line.getTeamName());
+            Team team = scoreboard.registerNewTeam(line.getName());
 
-            team.addEntry(line.getEntryName());
-            team.setPrefix(line.getCurrentLine());
-            team.setSuffix(ChatColor.RESET.toString());
+            team.addEntry(line.getName());
+            team.prefix(line.getCurrentLine());
+            team.suffix(Component.empty());
 
-            objective.getScore(line.getEntryName()).setScore(l - i);
+            objective.getScore(line.getName()).setScore(l - i);
             lines.add(line);
         }
     }
@@ -70,17 +71,17 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
     @Override
     public void applyTitle() {
         if (title.isChanged()) {
-            objective.setDisplayName(title.getCurrentLine());
+            objective.displayName(title.getCurrentLine());
         }
     }
 
     @Override
     public void applyLine(@NotNull LineDisplay line) {
         if (line.isChanged()) {
-            Team team = scoreboard.getTeam(line.getTeamName());
+            Team team = scoreboard.getTeam(line.getName());
 
             if (team != null) {
-                team.setPrefix(line.getCurrentLine());
+                team.prefix(line.getCurrentLine());
             }
         }
     }

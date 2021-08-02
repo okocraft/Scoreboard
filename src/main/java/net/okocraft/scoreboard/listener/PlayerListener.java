@@ -27,11 +27,11 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(@NotNull PlayerJoinEvent event) {
-        plugin.getDisplayManager().showDefaultBoard(event.getPlayer());
+        plugin.runAsync(() -> plugin.getDisplayManager().showDefaultBoard(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onQuit(@NotNull PlayerQuitEvent event) {
-        plugin.runAsync(() -> plugin.getDisplayManager().hideBoard(event.getPlayer()));
+        plugin.getDisplayManager().hideBoard(event.getPlayer());
     }
 }

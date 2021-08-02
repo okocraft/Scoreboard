@@ -99,7 +99,7 @@ public final class BoardLoader {
         } else {
             lines = new LinkedList<>();
 
-            for (String root : section.getPaths()) {
+            for (String root : section.getKeyList()) {
                 List<String> lineList = section.getStringList(root + PATH_LIST_SUFFIX);
 
                 if (lineList.isEmpty()) {

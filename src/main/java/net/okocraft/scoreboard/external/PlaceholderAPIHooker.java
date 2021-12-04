@@ -29,7 +29,11 @@ public final class PlaceholderAPIHooker {
     @NotNull
     public static String run(@NotNull Player player, @NotNull String str) {
         if (enabled && !str.isEmpty()) {
-            return PlaceholderAPI.setPlaceholders(player, str);
+            try {
+                return PlaceholderAPI.setPlaceholders(player, str);
+            } catch (Throwable ignored) {
+                return "";
+            }
         } else {
             return str;
         }

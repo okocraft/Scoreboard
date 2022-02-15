@@ -1,5 +1,9 @@
 package net.okocraft.scoreboard;
 
+import com.github.siroshun09.configapi.api.util.ResourceUtils;
+import com.github.siroshun09.translationloader.directory.TranslationDirectory;
+import net.kyori.adventure.key.Key;
+import net.okocraft.scoreboard.command.ScoreboardCommand;
 import net.okocraft.scoreboard.config.BoardManager;
 import net.okocraft.scoreboard.config.Configuration;
 import net.okocraft.scoreboard.display.manager.BukkitDisplayManager;
@@ -8,11 +12,13 @@ import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
 import net.okocraft.scoreboard.task.UpdateTask;
-import net.okocraft.scoreboard.util.LengthChecker;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +36,15 @@ public class ScoreboardPlugin extends JavaPlugin {
     public static @NotNull Plugin getPlugin() {
         return Objects.requireNonNull(INSTANCE);
     }
+
+    private final TranslationDirectory translationDirectory =
+            TranslationDirectory.newBuilder()
+                    .setKey(Key.key("scoreboard:languages"))
+                    .setDirectory(getDataFolder().toPath().resolve("languages"))
+                    .setDefaultLocale(Locale.ENGLISH)
+                    .onDirectoryCreated(this::saveDefaultLanguages)
+                    .build();
+
     private Configuration config;
 
     private BoardManager boardManager;
@@ -44,9 +59,13 @@ public class ScoreboardPlugin extends JavaPlugin {
     public void onLoad() {
         INSTANCE = this;
 
-        config = new Configuration(this);
+        try {
+            translationDirectory.load();
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Could not load languages", e);
+        }
 
-        LengthChecker.setLimit(config.getLengthLimit());
+        config = new Configuration(this);
 
         executor = Executors.newFixedThreadPool(config.getThreads());
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -66,6 +85,14 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         if (PlaceholderAPIHooker.checkEnabled(getServer())) {
             printPlaceholderIsAvailable();
+        }
+
+        var command = getCommand("sboard");
+
+        if (command != null) {
+            var impl = new ScoreboardCommand(this);
+            command.setExecutor(impl);
+            command.setTabCompleter(impl);
         }
 
         runAsync(() -> getServer().getOnlinePlayers().forEach(displayManager::showDefaultBoard));
@@ -92,6 +119,21 @@ public class ScoreboardPlugin extends JavaPlugin {
         if (scheduler != null) {
             scheduler.shutdownNow();
         }
+    }
+
+    public void reload() {
+        displayManager.hideAllBoards();
+
+        try {
+            translationDirectory.load();
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Could not load languages", e);
+        }
+
+        config.reload();
+        boardManager.reload();
+
+        runAsync(() -> getServer().getOnlinePlayers().forEach(displayManager::showDefaultBoard));
     }
 
     @NotNull
@@ -129,5 +171,13 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     public void printPlaceholderIsAvailable() {
         getLogger().info("PlaceholderAPI is available!");
+    }
+
+    private void saveDefaultLanguages(@NotNull Path directory) throws IOException {
+        var english = "en.yml";
+        ResourceUtils.copyFromJarIfNotExists(getFile().toPath(), english, directory.resolve(english));
+
+        var japanese = "ja_JP.yml";
+        ResourceUtils.copyFromJarIfNotExists(getFile().toPath(), japanese, directory.resolve(japanese));
     }
 }

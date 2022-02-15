@@ -13,4 +13,6 @@ public interface DisplayManager {
     void hideBoard(@NotNull Player player);
 
     void hideAllBoards();
+
+    boolean isDisplayed(@NotNull Player player);
 }

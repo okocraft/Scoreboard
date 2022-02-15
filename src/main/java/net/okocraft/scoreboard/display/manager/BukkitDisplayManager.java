@@ -4,6 +4,7 @@ import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.board.BoardDisplay;
 import net.okocraft.scoreboard.display.board.BukkitBoardDisplay;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.NotNull;
@@ -18,13 +19,18 @@ public class BukkitDisplayManager extends AbstractDisplayManager {
 
     @Override
     protected @NotNull BoardDisplay newDisplay(@NotNull Player player, @NotNull Board board) {
-        var future =
-                CompletableFuture.supplyAsync(
-                        this::newScoreboard,
-                        plugin.getServer().getScheduler().getMainThreadExecutor(plugin)
-                );
+        Scoreboard scoreboard;
 
-        return new BukkitBoardDisplay(plugin, board, player, future.join());
+        if (Bukkit.isPrimaryThread()) {
+            scoreboard = newScoreboard();
+        } else {
+            scoreboard = CompletableFuture.supplyAsync(
+                    this::newScoreboard,
+                    plugin.getServer().getScheduler().getMainThreadExecutor(plugin)
+            ).join();
+        }
+
+        return new BukkitBoardDisplay(plugin, board, player, scoreboard);
     }
 
     private @NotNull Scoreboard newScoreboard() {

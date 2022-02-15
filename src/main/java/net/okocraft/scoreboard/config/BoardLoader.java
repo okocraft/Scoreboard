@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -46,7 +45,7 @@ public final class BoardLoader {
 
     @NotNull
     @Unmodifiable
-    public static Set<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) throws IllegalStateException {
+    public static List<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) throws IllegalStateException {
         Path dirPath = plugin.getDataFolder().toPath().resolve("boards");
 
         if (Files.exists(dirPath)) {
@@ -66,14 +65,14 @@ public final class BoardLoader {
                         })
                         .filter(Objects::nonNull)
                         .map(BoardLoader::getBoard)
-                        .collect(Collectors.toUnmodifiableSet());
+                        .collect(Collectors.toList());
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
         } else {
             try {
                 Files.createDirectories(dirPath);
-                return Collections.emptySet();
+                return Collections.emptyList();
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
@@ -110,6 +109,8 @@ public final class BoardLoader {
             }
         }
 
-        return new Board(title, lines);
+        var name = yaml.getPath().getFileName().toString();
+
+        return new Board(name.substring(0, name.lastIndexOf('.')),title, lines);
     }
 }

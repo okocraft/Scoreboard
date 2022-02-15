@@ -21,6 +21,8 @@ public abstract class AbstractDisplayManager implements DisplayManager {
 
     @Override
     public void showBoard(@NotNull Player player, @NotNull Board board) {
+        hideBoard(player);
+
         var display = newDisplay(player, board);
 
         if (!display.isVisible()) {
@@ -54,6 +56,11 @@ public abstract class AbstractDisplayManager implements DisplayManager {
     public void hideAllBoards() {
         displays.stream().filter(BoardDisplay::isVisible).forEach(BoardDisplay::hideBoard);
         displays.clear();
+    }
+
+    @Override
+    public boolean isDisplayed(@NotNull Player player) {
+        return getDisplay(player).isPresent();
     }
 
     protected abstract @NotNull BoardDisplay newDisplay(@NotNull Player player, @NotNull Board board);

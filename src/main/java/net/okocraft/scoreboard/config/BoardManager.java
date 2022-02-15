@@ -15,7 +15,6 @@ public class BoardManager {
 
     public BoardManager(@NotNull ScoreboardPlugin plugin) {
         this.plugin = plugin;
-        reload();
     }
 
     @NotNull
@@ -28,7 +27,7 @@ public class BoardManager {
         return customBoards;
     }
 
-    public void reload() throws IllegalStateException {
+    public void reload() {
         defaultBoard = BoardLoader.loadDefaultBoard(plugin);
         customBoards = BoardLoader.loadCustomBoards(plugin);
     }

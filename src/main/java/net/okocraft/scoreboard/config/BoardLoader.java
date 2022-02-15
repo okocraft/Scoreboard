@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public final class BoardLoader {
+final class BoardLoader {
 
     private static final String DEFAULT_BOARD_FILE_NAME = "default.yml";
 
@@ -30,8 +30,7 @@ public final class BoardLoader {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    public static Board loadDefaultBoard(@NotNull ScoreboardPlugin plugin) throws IllegalStateException {
+    static @NotNull Board loadDefaultBoard(@NotNull ScoreboardPlugin plugin) {
         var yaml = YamlConfiguration.create(plugin.getDataFolder().toPath().resolve("default.yml"));
 
         try {
@@ -43,9 +42,7 @@ public final class BoardLoader {
         return getBoard(yaml);
     }
 
-    @NotNull
-    @Unmodifiable
-    public static List<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) throws IllegalStateException {
+    static @NotNull @Unmodifiable List<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) {
         Path dirPath = plugin.getDataFolder().toPath().resolve("boards");
 
         if (Files.exists(dirPath)) {
@@ -59,7 +56,8 @@ public final class BoardLoader {
                             try {
                                 yaml.load();
                                 return yaml;
-                            } catch (IOException ignored) {
+                            } catch (IOException e) {
+                                plugin.getLogger().log(Level.SEVERE, "Could not load " + yaml.getPath().getFileName(), e);
                                 return null;
                             }
                         })
@@ -67,14 +65,16 @@ public final class BoardLoader {
                         .map(BoardLoader::getBoard)
                         .collect(Collectors.toList());
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                plugin.getLogger().log(Level.SEVERE, "Could not load board files", e);
+                return Collections.emptyList();
             }
         } else {
             try {
                 Files.createDirectories(dirPath);
                 return Collections.emptyList();
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                plugin.getLogger().log(Level.SEVERE, "Could not create board directory", e);
+                return Collections.emptyList();
             }
         }
     }
@@ -111,6 +111,6 @@ public final class BoardLoader {
 
         var name = yaml.getPath().getFileName().toString();
 
-        return new Board(name.substring(0, name.lastIndexOf('.')),title, lines);
+        return new Board(name.substring(0, name.lastIndexOf('.')), title, lines);
     }
 }

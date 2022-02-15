@@ -48,9 +48,9 @@ line: # 表示する行設定
 
 ### コマンド
 
-`/sb reload` - `config.yml`, `default.yml`, 言語ファイル, `boards` 下のファイルを再読み込み
-`/sb show {default/ボード名} {プレイヤー}` - 指定したプレイヤーまたは自分にボードを表示する
-`/sb hide {プレイヤー}` - 指定したプレイヤーまたは自分のボードを非表示にする
+- `/sb reload` - `config.yml`, `default.yml`, 言語ファイル, `boards` 下のファイルを再読み込み
+- `/sb show {default/ボード名} {プレイヤー}` - 指定したプレイヤーまたは自分にボードを表示する
+- `/sb hide {プレイヤー}` - 指定したプレイヤーまたは自分のボードを非表示にする
 
 ## License
 

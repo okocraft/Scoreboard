@@ -2,8 +2,7 @@ package net.okocraft.scoreboard.display.board;
 
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.display.line.LineDisplay;
-import net.okocraft.scoreboard.task.LineUpdateTask;
-import net.okocraft.scoreboard.task.TitleUpdateTask;
+import net.okocraft.scoreboard.task.UpdateTask;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,12 +34,18 @@ public abstract class AbstractBoardDisplay implements BoardDisplay {
     @Override
     public void scheduleUpdateTasks() {
         if (getTitle().shouldUpdate()) {
-            updateTasks.add(plugin.scheduleUpdateTask(new TitleUpdateTask(plugin, this), getTitle().getInterval()));
+            updateTasks.add(
+                    plugin.scheduleUpdateTask(new UpdateTask(this, getTitle(), true),
+                            getTitle().getInterval())
+            );
         }
 
         for (LineDisplay line : getLines()) {
             if (line.shouldUpdate()) {
-                updateTasks.add(plugin.scheduleUpdateTask(new LineUpdateTask(plugin, this, line), line.getInterval()));
+                updateTasks.add(
+                        plugin.scheduleUpdateTask(new UpdateTask(this, line, false),
+                                line.getInterval())
+                );
             }
         }
     }
@@ -57,8 +62,7 @@ public abstract class AbstractBoardDisplay implements BoardDisplay {
             return true;
         }
 
-        if (o instanceof AbstractBoardDisplay) {
-            AbstractBoardDisplay that = (AbstractBoardDisplay) o;
+        if (o instanceof AbstractBoardDisplay that) {
             return player.equals(that.player);
         } else {
             return false;

@@ -28,28 +28,16 @@ public class PluginListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEnable(@NotNull PluginEnableEvent event) {
-        switch (event.getPlugin().getName()) {
-            case "PlaceholderAPI":
-                PlaceholderAPIHooker.setEnabled(true);
-                plugin.printPlaceholderIsAvailable();
-                return;
-            case "ProtocolLib":
-                plugin.updateDisplayManager(true);
-                return;
-            default:
+        if (event.getPlugin().getName().equals("PlaceholderAPI")) {
+            PlaceholderAPIHooker.setEnabled(true);
+            plugin.printPlaceholderIsAvailable();
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDisable(@NotNull PluginDisableEvent event) {
-        switch (event.getPlugin().getName()) {
-            case "PlaceholderAPI":
-                PlaceholderAPIHooker.setEnabled(false);
-                return;
-            case "ProtocolLib":
-                plugin.updateDisplayManager(false);
-                return;
-            default:
+        if (event.getPlugin().getName().equals("PlaceholderAPI")) {
+            PlaceholderAPIHooker.setEnabled(false);
         }
     }
 }

@@ -14,5 +14,5 @@ public interface DisplayManager {
 
     void hideAllBoards();
 
-    boolean isUsingProtocolLib();
+    boolean isDisplayed(@NotNull Player player);
 }

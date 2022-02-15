@@ -1,13 +1,10 @@
 package net.okocraft.scoreboard.config;
 
-import com.github.siroshun09.configapi.bukkit.BukkitConfig;
-import com.github.siroshun09.configapi.bukkit.BukkitYaml;
+import com.github.siroshun09.configapi.yaml.YamlConfiguration;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.board.Line;
-import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
@@ -17,10 +14,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public final class BoardLoader {
+final class BoardLoader {
 
     private static final String DEFAULT_BOARD_FILE_NAME = "default.yml";
 
@@ -29,25 +26,23 @@ public final class BoardLoader {
     private static final String PATH_LIST_SUFFIX = ".list";
     private static final String PATH_INTERVAL_SUFFIX = ".interval";
 
-
     private BoardLoader() {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    public static Board loadDefaultBoard(@NotNull ScoreboardPlugin plugin) throws IllegalStateException {
-        Board board = load(new BukkitConfig(plugin, DEFAULT_BOARD_FILE_NAME, true));
+    static @NotNull Board loadDefaultBoard(@NotNull ScoreboardPlugin plugin) {
+        var yaml = YamlConfiguration.create(plugin.getDataFolder().toPath().resolve("default.yml"));
 
-        if (board == null) {
-            throw new IllegalStateException("Could not load default board (" + DEFAULT_BOARD_FILE_NAME + ")");
-        } else {
-            return board;
+        try {
+            yaml.load();
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not load default.yml", e);
         }
+
+        return getBoard(yaml);
     }
 
-    @NotNull
-    @Unmodifiable
-    public static Set<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) throws IllegalStateException {
+    static @NotNull @Unmodifiable List<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) {
         Path dirPath = plugin.getDataFolder().toPath().resolve("boards");
 
         if (Files.exists(dirPath)) {
@@ -56,29 +51,35 @@ public final class BoardLoader {
                         .filter(Files::isRegularFile)
                         .filter(Files::isReadable)
                         .filter(p -> !p.toString().endsWith(DEFAULT_BOARD_FILE_NAME))
-                        .map(BukkitYaml::new)
-                        .map(BoardLoader::load)
+                        .map(YamlConfiguration::create)
+                        .map(yaml -> {
+                            try {
+                                yaml.load();
+                                return yaml;
+                            } catch (IOException e) {
+                                plugin.getLogger().log(Level.SEVERE, "Could not load " + yaml.getPath().getFileName(), e);
+                                return null;
+                            }
+                        })
                         .filter(Objects::nonNull)
-                        .collect(Collectors.toUnmodifiableSet());
+                        .map(BoardLoader::getBoard)
+                        .collect(Collectors.toList());
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                plugin.getLogger().log(Level.SEVERE, "Could not load board files", e);
+                return Collections.emptyList();
             }
         } else {
             try {
                 Files.createDirectories(dirPath);
-                return Collections.emptySet();
+                return Collections.emptyList();
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                plugin.getLogger().log(Level.SEVERE, "Could not create board directory", e);
+                return Collections.emptyList();
             }
         }
     }
 
-    @Nullable
-    private static Board load(@NotNull BukkitYaml yaml) {
-        if (!yaml.load()) {
-            return null;
-        }
-
+    private static @NotNull Board getBoard(@NotNull YamlConfiguration yaml) {
         List<String> titleList = yaml.getStringList(PATH_TITLE + PATH_LIST_SUFFIX);
         Line title;
 
@@ -88,7 +89,7 @@ public final class BoardLoader {
             title = new Line(titleList, yaml.getLong(PATH_TITLE + PATH_INTERVAL_SUFFIX));
         }
 
-        ConfigurationSection section = yaml.getConfig().getConfigurationSection(PATH_LINE);
+        var section = yaml.getSection(PATH_LINE);
 
         List<Line> lines;
 
@@ -97,7 +98,7 @@ public final class BoardLoader {
         } else {
             lines = new LinkedList<>();
 
-            for (String root : section.getKeys(false)) {
+            for (String root : section.getKeyList()) {
                 List<String> lineList = section.getStringList(root + PATH_LIST_SUFFIX);
 
                 if (lineList.isEmpty()) {
@@ -108,6 +109,8 @@ public final class BoardLoader {
             }
         }
 
-        return new Board(title, lines);
+        var name = yaml.getPath().getFileName().toString();
+
+        return new Board(name.substring(0, name.lastIndexOf('.')), title, lines);
     }
 }

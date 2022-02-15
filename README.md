@@ -5,26 +5,23 @@
 
 master:
 ![Java CI](https://github.com/okocraft/Scoreboard/workflows/Java%20CI/badge.svg?branch=master)
-![Lint Code Base](https://github.com/okocraft/Scoreboard/workflows/Lint%20Code%20Base/badge.svg?branch=master)
 
 develop:
 ![Java CI](https://github.com/okocraft/Scoreboard/workflows/Java%20CI/badge.svg?branch=develop)
-![Lint Code Base](https://github.com/okocraft/Scoreboard/workflows/Lint%20Code%20Base/badge.svg?branch=develop)
 
 ゲーム画面の右側にカスタマイズしたスコアボードを表示する Spigot プラグインです。
 
 ## Requirements
 
-- Java 11+
-- Spigot 1.15+
+- Java 16+
+- Paper 1.17+
 - (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
-- (Optional) [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
 
 ## Usage
 
 サーバーディレクトリの `/plugins/` に配置し、サーバーを再起動する。
 
-`config.yml` で表示される文字数の制限と ProtocolLib の使用、`default.yml` でボードの表示設定ができます。
+`config.yml` で表示される文字数の制限、`default.yml` でボードの表示設定ができます。
 
 ```yaml
 # default.yml 設定例
@@ -43,8 +40,17 @@ line: # 表示する行設定
     interval: 60
     list:
       - " %player_ping%ms&7"
-      - " %Imperatrix_tps% TPS"
+      - " %server_tps% TPS"
 ```
+
+また、`./plugins/Scoreboard/boards/` に上記のように設定した Yaml ファイルを置くと、
+`/sb show <拡張子なしファイル名>` でボードを表示できます。
+
+### コマンド
+
+`/sb reload` - `config.yml`, `default.yml`, 言語ファイル, `boards` 下のファイルを再読み込み
+`/sb show {default/ボード名} {プレイヤー}` - 指定したプレイヤーまたは自分にボードを表示する
+`/sb hide {プレイヤー}` - 指定したプレイヤーまたは自分のボードを非表示にする
 
 ## License
 
@@ -52,4 +58,4 @@ line: # 表示する行設定
 
 This project is licensed under the permissive GPL-3.0 license. Please see [LICENSE](LICENSE) for more info.
 
-Copyright © 2019-2020, Siroshun09
+Copyright © 2019-2022, Siroshun09

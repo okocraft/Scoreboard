@@ -4,18 +4,17 @@ import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.List;
 
 public class BoardManager {
 
     private final ScoreboardPlugin plugin;
 
     private Board defaultBoard;
-    private Set<Board> customBoards;
+    private List<Board> customBoards;
 
     public BoardManager(@NotNull ScoreboardPlugin plugin) {
         this.plugin = plugin;
-        reload();
     }
 
     @NotNull
@@ -24,11 +23,11 @@ public class BoardManager {
     }
 
     @NotNull
-    public Set<Board> getCustomBoards() {
+    public List<Board> getCustomBoards() {
         return customBoards;
     }
 
-    public void reload() throws IllegalStateException {
+    public void reload() {
         defaultBoard = BoardLoader.loadDefaultBoard(plugin);
         customBoards = BoardLoader.loadCustomBoards(plugin);
     }

@@ -8,14 +8,11 @@ import java.util.List;
 
 public interface BoardDisplay {
 
-    @NotNull
-    Player getPlayer();
+    @NotNull Player getPlayer();
 
-    @NotNull
-    LineDisplay getTitle();
+    @NotNull LineDisplay getTitle();
 
-    @NotNull
-    List<LineDisplay> getLines();
+    @NotNull List<LineDisplay> getLines();
 
     boolean isVisible();
 

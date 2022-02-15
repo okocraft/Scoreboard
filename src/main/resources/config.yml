@@ -1,4 +1,1 @@
-board:
-  limit: 32
-  threads: 5
-use-ProtocolLib: true
+max-line-length: 32

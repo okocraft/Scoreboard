@@ -1,5 +1,6 @@
 package net.okocraft.scoreboard.display.placeholder;
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,17 @@ public final class Placeholders {
     public static String replace(@NotNull Player p, @NotNull String line) {
         if (line.contains("%server_tps%")) {
             line = line.replace("%server_tps%", Double.toString(getTps()));
+        }
+
+        if (line.contains("%player_name%")) {
+            line = line.replace("%player_name%", p.getName());
+        }
+
+        if (line.contains("%player_displayname%")) {
+            line = line.replace(
+                    "%player_displayname%",
+                    LegacyComponentSerializer.legacyAmpersand().serialize(p.displayName())
+            );
         }
 
         if (line.contains("%player_block_x%")) {

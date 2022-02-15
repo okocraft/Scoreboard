@@ -40,8 +40,17 @@ line: # 表示する行設定
     interval: 60
     list:
       - " %player_ping%ms&7"
-      - " %Imperatrix_tps% TPS"
+      - " %server_tps% TPS"
 ```
+
+また、`./plugins/Scoreboard/boards/` に上記のように設定した Yaml ファイルを置くと、
+`/sb show <拡張子なしファイル名>` でボードを表示できます。
+
+### コマンド
+
+`/sb reload` - `config.yml`, `default.yml`, 言語ファイル, `boards` 下のファイルを再読み込み
+`/sb show {default/ボード名} {プレイヤー}` - 指定したプレイヤーまたは自分にボードを表示する
+`/sb hide {プレイヤー}` - 指定したプレイヤーまたは自分のボードを非表示にする
 
 ## License
 
@@ -49,4 +58,4 @@ line: # 表示する行設定
 
 This project is licensed under the permissive GPL-3.0 license. Please see [LICENSE](LICENSE) for more info.
 
-Copyright © 2019-2020, Siroshun09
+Copyright © 2019-2022, Siroshun09

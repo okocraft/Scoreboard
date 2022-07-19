@@ -100,7 +100,7 @@ public class ScoreboardPlugin extends JavaPlugin {
             command.setTabCompleter(impl);
         }
 
-        runAsync(() -> getServer().getOnlinePlayers().forEach(displayManager::showDefaultBoard));
+        runAsync(this::showDefaultBoardToOnlinePlayers);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         loadConfig();
         boardManager.reload();
 
-        runAsync(() -> getServer().getOnlinePlayers().forEach(displayManager::showDefaultBoard));
+        runAsync(this::showDefaultBoardToOnlinePlayers);
     }
 
     @NotNull
@@ -203,5 +203,12 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         var japanese = "ja_JP.yml";
         ResourceUtils.copyFromJarIfNotExists(getFile().toPath(), japanese, directory.resolve(japanese));
+    }
+
+    private void showDefaultBoardToOnlinePlayers() {
+        getServer().getOnlinePlayers()
+                .stream()
+                .filter(player -> player.hasPermission("scoreboard.show-on-join"))
+                .forEach(displayManager::showDefaultBoard);
     }
 }

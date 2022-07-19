@@ -20,3 +20,5 @@ permissions:
     default: op
   scoreboard.command.show.other:
     default: op
+  scoreboard.show-on-join:
+    default: op

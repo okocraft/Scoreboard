@@ -13,7 +13,7 @@ develop:
 
 ## Requirements
 
-- Java 16+
+- Java 17+
 - Paper 1.17+
 - (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 

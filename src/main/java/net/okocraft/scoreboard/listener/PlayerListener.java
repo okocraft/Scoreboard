@@ -25,12 +25,16 @@ public class PlayerListener implements Listener {
         HandlerList.unregisterAll(this);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(@NotNull PlayerJoinEvent event) {
-        plugin.runAsync(() -> plugin.getDisplayManager().showDefaultBoard(event.getPlayer()));
+        var player = event.getPlayer();
+
+        if (player.hasPermission("scoreboard.show-on-join")) {
+            plugin.runAsync(() -> plugin.getDisplayManager().showDefaultBoard(event.getPlayer()));
+        }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(@NotNull PlayerQuitEvent event) {
         plugin.getDisplayManager().hideBoard(event.getPlayer());
     }

@@ -52,6 +52,16 @@ line: # 表示する行設定
 - `/sb show {default/ボード名} {プレイヤー}` - 指定したプレイヤーまたは自分にボードを表示する
 - `/sb hide {プレイヤー}` - 指定したプレイヤーまたは自分のボードを非表示にする
 
+## 権限
+
+- scoreoreboard.command - `/sb` の実行権限
+- scoreoreboard.command.reload - `/sb reload` の実行権限
+- scoreoreboard.command.hide - `/sb hide` の実行権限
+- scoreoreboard.command.hide.other - `/sb hide {player}` の実行権限
+- scoreoreboard.command.show - `/sb show` の実行権限
+- scoreoreboard.command.show.other - `/sb {board name} {player}` の実行権限
+- scoreoreboard.show-on-join - サーバー参加時にデフォルトのボードを表示させる権限
+
 ## License
 
 このプロジェクトは GPL-3.0 のもとで公開しています。詳しくは [ライセンスファイル](LICENSE) をお読みください。

@@ -59,7 +59,7 @@ line: # 表示する行設定
 - scoreoreboard.command.hide - `/sb hide` の実行権限
 - scoreoreboard.command.hide.other - `/sb hide {player}` の実行権限
 - scoreoreboard.command.show - `/sb show` の実行権限
-- scoreoreboard.command.show.other - `/sb {board name} {player}` の実行権限
+- scoreoreboard.command.show.other - `/sb show {board name} {player}` の実行権限
 - scoreoreboard.show-on-join - サーバー参加時にデフォルトのボードを表示させる権限
 
 ## License

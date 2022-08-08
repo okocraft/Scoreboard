@@ -46,6 +46,10 @@ public final class Placeholders {
             );
         }
 
+        if (line.contains("%player_world%")) {
+            line = line.replace("%player_world%", p.getWorld().getName());
+        }
+
         if (line.contains("%player_block_x%")) {
             var value = p.getLocation().getBlockX();
             line = line.replace("%player_block_x%", Integer.toString(value));

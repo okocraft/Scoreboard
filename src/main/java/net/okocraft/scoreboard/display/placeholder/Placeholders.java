@@ -5,26 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 public final class Placeholders {
-
-    private static final Object SERVER;
-    private static final Field TPS_FIELD;
-
-    static {
-        try {
-            SERVER = Bukkit.getServer().getClass()
-                    .getDeclaredMethod("getServer").invoke(Bukkit.getServer());
-
-            TPS_FIELD = SERVER.getClass().getField("recentTps");
-            TPS_FIELD.setAccessible(true);
-        } catch (Throwable e) {
-            throw new IllegalStateException(e);
-        }
-    }
 
     private Placeholders() {
     }
@@ -32,7 +13,7 @@ public final class Placeholders {
     @NotNull
     public static String replace(@NotNull Player p, @NotNull String line) {
         if (line.contains("%server_tps%")) {
-            line = line.replace("%server_tps%", Double.toString(getTps()));
+            line = line.replace("%server_tps%", Double.toString(Bukkit.getTPS()[0]));
         }
 
         if (line.contains("%server_online%")) {
@@ -75,18 +56,5 @@ public final class Placeholders {
         }
 
         return line;
-    }
-
-    private static double getTps() {
-        try {
-            double[] recentTps = (double[]) TPS_FIELD.get(SERVER);
-
-            return BigDecimal.valueOf(recentTps[0])
-                    .setScale(2, RoundingMode.HALF_UP)
-                    .doubleValue();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return 0;
-        }
     }
 }

@@ -5,6 +5,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public final class Placeholders {
 
     private Placeholders() {
@@ -13,7 +16,10 @@ public final class Placeholders {
     @NotNull
     public static String replace(@NotNull Player p, @NotNull String line) {
         if (line.contains("%server_tps%")) {
-            line = line.replace("%server_tps%", Double.toString(Bukkit.getTPS()[0]));
+            line = line.replace(
+                    "%server_tps%",
+                    Double.toString(BigDecimal.valueOf(Bukkit.getTPS()[0]).setScale(2, RoundingMode.HALF_UP).doubleValue())
+            );
         }
 
         if (line.contains("%server_online%")) {

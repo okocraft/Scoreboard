@@ -35,6 +35,10 @@ public final class Placeholders {
             line = line.replace("%server_tps%", Double.toString(getTps()));
         }
 
+        if (line.contains("%server_online%")) {
+            line = line.replace("%server_online%", Integer.toString(Bukkit.getOnlinePlayers().size()));
+        }
+
         if (line.contains("%player_name%")) {
             line = line.replace("%player_name%", p.getName());
         }

@@ -13,6 +13,7 @@ import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
 import net.okocraft.scoreboard.task.UpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
+import net.okocraft.scoreboard.util.ScheduledExecutorFactory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +22,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -46,13 +45,12 @@ public class ScoreboardPlugin extends JavaPlugin {
                     .onDirectoryCreated(this::saveDefaultLanguages)
                     .build();
 
+    private final ScheduledExecutorService scheduler = ScheduledExecutorFactory.create(3);
+
     private BoardManager boardManager;
     private DisplayManager displayManager;
     private PlayerListener playerListener;
     private PluginListener pluginListener;
-
-    private ExecutorService executor;
-    private ScheduledExecutorService scheduler;
 
     @Override
     public void onLoad() {
@@ -73,9 +71,6 @@ public class ScoreboardPlugin extends JavaPlugin {
         loadConfig();
         boardManager = new BoardManager(this);
         boardManager.reload();
-
-        executor = Executors.newFixedThreadPool(2);
-        scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     @Override
@@ -117,13 +112,7 @@ public class ScoreboardPlugin extends JavaPlugin {
             pluginListener.unregister();
         }
 
-        if (executor != null) {
-            executor.shutdownNow();
-        }
-
-        if (scheduler != null) {
-            scheduler.shutdownNow();
-        }
+        scheduler.shutdownNow();
     }
 
     public void reload() {
@@ -159,19 +148,23 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     public void runAsync(@NotNull Runnable runnable) {
-        executor.submit(() -> {
-            try {
-                runnable.run();
-            } catch (Throwable e) {
-                getLogger().log(Level.SEVERE, null, e);
-            }
-        });
+        scheduler.submit(wrapTask(runnable));
     }
 
     @NotNull
     public ScheduledFuture<?> scheduleUpdateTask(@NotNull UpdateTask task, long tick) {
         long interval = tick * MILLISECONDS_PER_TICK;
-        return scheduler.scheduleWithFixedDelay(() -> runAsync(task), interval, interval, TimeUnit.MILLISECONDS);
+        return scheduler.scheduleWithFixedDelay(wrapTask(task), interval, interval, TimeUnit.MILLISECONDS);
+    }
+
+    private @NotNull Runnable wrapTask(@NotNull Runnable task) {
+        return () -> {
+            try {
+                task.run();
+            } catch (Throwable e) {
+                getLogger().log(Level.SEVERE, null, e);
+            }
+        };
     }
 
     public void printPlaceholderIsAvailable() {

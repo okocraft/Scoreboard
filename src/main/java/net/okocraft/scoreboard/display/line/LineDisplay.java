@@ -13,11 +13,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
 
 public class LineDisplay {
-
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("%([^%]+)%");
 
     private final Player player;
     private final Line line;
@@ -76,18 +73,14 @@ public class LineDisplay {
         return line.getInterval();
     }
 
-    private boolean hasPlaceholders(@NotNull String str) {
-        return str.indexOf('%') != -1 && PLACEHOLDER_PATTERN.matcher(str).find();
-    }
-
     private @NotNull TextComponent processLine(@NotNull String line) {
-        var processing = Placeholders.replace(player, line);
+        var replaceResult = Placeholders.replace(player, line); // replace built-in placeholders
+        var processing = replaceResult.replaced();
 
-        if (PlaceholderAPIHooker.isEnabled() && hasPlaceholders(processing)) {
-            var toReplace = processing;
+        if (PlaceholderAPIHooker.isEnabled() && replaceResult.hasUnknownPlaceholders()) {
             processing =
                     CompletableFuture.supplyAsync(
-                            () -> PlaceholderAPIHooker.run(player, toReplace),
+                            () -> PlaceholderAPIHooker.run(player, replaceResult.replaced()),
                             Bukkit.getScheduler().getMainThreadExecutor(ScoreboardPlugin.getPlugin())
                     ).join();
         }

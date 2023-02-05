@@ -11,11 +11,12 @@ import java.math.RoundingMode;
 
 public final class Placeholders {
 
-    public static @NotNull String replace(@NotNull Player player, @NotNull String line) {
+    public static @NotNull Result replace(@NotNull Player player, @NotNull String line) {
         var locationSnapshot = player.getLocation();
         var resultBuilder = new StringBuilder();
 
         boolean inPlaceholder = false;
+        boolean hasUnknownPlaceholders = false;
 
         var placeholderBuilder = new StringBuilder();
 
@@ -24,7 +25,14 @@ public final class Placeholders {
                 placeholderBuilder.appendCodePoint(codePoint);
 
                 if (inPlaceholder) {
-                    resultBuilder.append(processPlaceholder(player, locationSnapshot, placeholderBuilder.toString()));
+                    var placeholder = placeholderBuilder.toString();
+                    var replaced = processPlaceholder(player, locationSnapshot, placeholder);
+
+                    if (!hasUnknownPlaceholders && placeholder.equals(replaced)) {
+                        hasUnknownPlaceholders = true;
+                    }
+
+                    resultBuilder.append(replaced);
                     placeholderBuilder.setLength(0);
                 }
 
@@ -38,7 +46,7 @@ public final class Placeholders {
             }
         }
 
-        return resultBuilder.toString();
+        return new Result(resultBuilder.toString(), hasUnknownPlaceholders);
     }
 
     private static @NotNull String processPlaceholder(@NotNull Player player, @NotNull Location locationSnapshot, @NotNull String placeholder) {
@@ -59,5 +67,8 @@ public final class Placeholders {
     }
 
     private Placeholders() {
+    }
+
+    public record Result(@NotNull String replaced, boolean hasUnknownPlaceholders) {
     }
 }

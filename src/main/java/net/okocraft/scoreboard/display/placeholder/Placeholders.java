@@ -2,6 +2,7 @@ package net.okocraft.scoreboard.display.placeholder;
 
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,57 +11,53 @@ import java.math.RoundingMode;
 
 public final class Placeholders {
 
-    private Placeholders() {
+    public static @NotNull String replace(@NotNull Player player, @NotNull String line) {
+        var locationSnapshot = player.getLocation();
+        var resultBuilder = new StringBuilder();
+
+        boolean inPlaceholder = false;
+
+        var placeholderBuilder = new StringBuilder();
+
+        for (int codePoint : line.codePoints().toArray()) {
+            if (codePoint == '%') {
+                placeholderBuilder.appendCodePoint(codePoint);
+
+                if (inPlaceholder) {
+                    resultBuilder.append(processPlaceholder(player, locationSnapshot, placeholderBuilder.toString()));
+                    placeholderBuilder.setLength(0);
+                }
+
+                inPlaceholder = !inPlaceholder;
+            } else {
+                if (inPlaceholder) {
+                    placeholderBuilder.appendCodePoint(codePoint);
+                } else {
+                    resultBuilder.appendCodePoint(codePoint);
+                }
+            }
+        }
+
+        return resultBuilder.toString();
     }
 
-    @NotNull
-    public static String replace(@NotNull Player p, @NotNull String line) {
-        if (line.contains("%server_tps%")) {
-            line = line.replace(
-                    "%server_tps%",
-                    Double.toString(BigDecimal.valueOf(Bukkit.getTPS()[0]).setScale(2, RoundingMode.HALF_UP).doubleValue())
-            );
-        }
+    private static @NotNull String processPlaceholder(@NotNull Player player, @NotNull Location locationSnapshot, @NotNull String placeholder) {
+        //@formatter:off
+        return switch (placeholder) {
+            case "%server_tps%" -> BigDecimal.valueOf(Bukkit.getTPS()[0]).setScale(2, RoundingMode.HALF_UP).toPlainString();
+            case "%server_online%" -> Integer.toString(Bukkit.getOnlinePlayers().size());
+            case "%player_name%" -> player.getName();
+            case "%player_displayname%" -> LegacyComponentSerializer.legacyAmpersand().serialize(player.displayName());
+            case "%player_world%" -> player.getWorld().getName();
+            case "%player_block_x%" -> Integer.toString(locationSnapshot.getBlockX());
+            case "%player_block_y%" -> Integer.toString(locationSnapshot.getBlockY());
+            case "%player_block_z%" -> Integer.toString(locationSnapshot.getBlockZ());
+            case "%player_ping%" -> Integer.toString(player.getPing());
+            default -> placeholder;
+        };
+        //@formatter:on
+    }
 
-        if (line.contains("%server_online%")) {
-            line = line.replace("%server_online%", Integer.toString(Bukkit.getOnlinePlayers().size()));
-        }
-
-        if (line.contains("%player_name%")) {
-            line = line.replace("%player_name%", p.getName());
-        }
-
-        if (line.contains("%player_displayname%")) {
-            line = line.replace(
-                    "%player_displayname%",
-                    LegacyComponentSerializer.legacyAmpersand().serialize(p.displayName())
-            );
-        }
-
-        if (line.contains("%player_world%")) {
-            line = line.replace("%player_world%", p.getWorld().getName());
-        }
-
-        if (line.contains("%player_block_x%")) {
-            var value = p.getLocation().getBlockX();
-            line = line.replace("%player_block_x%", Integer.toString(value));
-        }
-
-        if (line.contains("%player_block_y%")) {
-            var value = p.getLocation().getBlockY();
-            line = line.replace("%player_block_y%", Integer.toString(value));
-        }
-
-        if (line.contains("%player_block_z%")) {
-            var value = p.getLocation().getBlockZ();
-            line = line.replace("%player_block_z%", Integer.toString(value));
-        }
-
-        if (line.contains("%player_ping%")) {
-            var value = p.getPing();
-            line = line.replace("%player_ping%", Integer.toString(value));
-        }
-
-        return line;
+    private Placeholders() {
     }
 }

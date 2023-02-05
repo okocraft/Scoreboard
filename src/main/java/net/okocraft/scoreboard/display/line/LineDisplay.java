@@ -78,11 +78,15 @@ public class LineDisplay {
         var processing = replaceResult.replaced();
 
         if (PlaceholderAPIHooker.isEnabled() && replaceResult.hasUnknownPlaceholders()) {
-            processing =
-                    CompletableFuture.supplyAsync(
-                            () -> PlaceholderAPIHooker.run(player, replaceResult.replaced()),
-                            Bukkit.getScheduler().getMainThreadExecutor(ScoreboardPlugin.getPlugin())
-                    ).join();
+            if (Bukkit.isPrimaryThread()) {
+                processing = PlaceholderAPIHooker.run(player, replaceResult.replaced());
+            } else {
+                processing =
+                        CompletableFuture.supplyAsync(
+                                () -> PlaceholderAPIHooker.run(player, replaceResult.replaced()),
+                                Bukkit.getScheduler().getMainThreadExecutor(ScoreboardPlugin.getPlugin())
+                        ).join();
+            }
         }
 
         processing = LengthChecker.check(processing);

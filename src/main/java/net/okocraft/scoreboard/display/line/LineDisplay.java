@@ -37,9 +37,7 @@ public class LineDisplay {
         if (line.isEmpty()) {
             this.currentLine = Component.empty();
         } else {
-            var temp = PlaceholderAPIHooker.run(player, line.get(0));
-            temp = LengthChecker.check(temp);
-            currentLine = LegacyComponentSerializer.legacyAmpersand().deserialize(temp);
+            this.currentLine = processLine(line.get(0));
         }
     }
 
@@ -58,24 +56,7 @@ public class LineDisplay {
             currentIndex = 0;
         }
 
-        var nextLine = line.get(currentIndex);
-
-        if (hasPlaceholders(nextLine)) {
-            nextLine = Placeholders.replace(player, nextLine);
-        }
-
-        if (PlaceholderAPIHooker.isEnabled() && hasPlaceholders(nextLine)) {
-            var toReplace = nextLine;
-            nextLine =
-                    CompletableFuture.supplyAsync(
-                            () -> PlaceholderAPIHooker.run(player, toReplace),
-                            Bukkit.getScheduler().getMainThreadExecutor(ScoreboardPlugin.getPlugin())
-                    ).join();
-        }
-
-        nextLine = LengthChecker.check(nextLine);
-
-        currentLine = LegacyComponentSerializer.legacyAmpersand().deserialize(nextLine);
+        currentLine = processLine(line.get(currentIndex));
     }
 
     public boolean isChanged() {
@@ -97,5 +78,22 @@ public class LineDisplay {
 
     private boolean hasPlaceholders(@NotNull String str) {
         return str.indexOf('%') != -1 && PLACEHOLDER_PATTERN.matcher(str).find();
+    }
+
+    private @NotNull TextComponent processLine(@NotNull String line) {
+        var processing = Placeholders.replace(player, line);
+
+        if (PlaceholderAPIHooker.isEnabled() && hasPlaceholders(processing)) {
+            var toReplace = processing;
+            processing =
+                    CompletableFuture.supplyAsync(
+                            () -> PlaceholderAPIHooker.run(player, toReplace),
+                            Bukkit.getScheduler().getMainThreadExecutor(ScoreboardPlugin.getPlugin())
+                    ).join();
+        }
+
+        processing = LengthChecker.check(processing);
+
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(processing);
     }
 }

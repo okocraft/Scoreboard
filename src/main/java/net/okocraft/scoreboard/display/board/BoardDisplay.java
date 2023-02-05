@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface BoardDisplay {
 
-    @NotNull Player getPlayer();
-
     @NotNull LineDisplay getTitle();
 
     @NotNull List<LineDisplay> getLines();

@@ -6,6 +6,7 @@ import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
@@ -13,11 +14,13 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
+    private final Player player;
     private final Scoreboard scoreboard;
     private final Objective objective;
 
@@ -26,19 +29,20 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
 
     public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board,
                               @NotNull Player player, @NotNull Scoreboard scoreboard) {
-        super(plugin, player);
-
+        super(plugin);
+        this.player = player;
         this.scoreboard = scoreboard;
 
         this.title = new LineDisplay(player, board.getTitle(), 0);
 
-        objective = scoreboard.registerNewObjective("sb", "sb", title.getCurrentLine(), RenderType.INTEGER);
+        objective = scoreboard.registerNewObjective("sb", Criteria.DUMMY, title.getCurrentLine(), RenderType.INTEGER);
 
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        this.lines = new LinkedList<>();
+        int size = Math.min(board.getLines().size(), MAX_LINES);
+        var lines = new ArrayList<LineDisplay>(size);
 
-        for (int i = 0, l = board.getLines().size(); i < l && i < 16; i++) {
+        for (int i = 0; i < size; i++) {
             LineDisplay line = new LineDisplay(player, board.getLines().get(i), i);
 
             Team team = scoreboard.registerNewTeam(line.getName());
@@ -49,9 +53,12 @@ public class BukkitBoardDisplay extends AbstractBoardDisplay {
             team.prefix(line.getCurrentLine());
             team.suffix(Component.empty());
 
-            objective.getScore(entryName).setScore(l - i);
+            objective.getScore(entryName).setScore(size - i);
+
             lines.add(line);
         }
+
+        this.lines = Collections.unmodifiableList(lines);
     }
 
     @Override

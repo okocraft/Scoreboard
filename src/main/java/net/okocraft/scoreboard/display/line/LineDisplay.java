@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public class LineDisplay {
 
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("[%]([^%]+)[%]");
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("%([^%]+)%");
 
     private final Player player;
     private final Line line;
@@ -58,24 +58,24 @@ public class LineDisplay {
             currentIndex = 0;
         }
 
-        var temp = line.get(currentIndex);
+        var nextLine = line.get(currentIndex);
 
-        if (hasPlaceholders(temp)) {
-            temp = Placeholders.replace(player, temp);
+        if (hasPlaceholders(nextLine)) {
+            nextLine = Placeholders.replace(player, nextLine);
         }
 
-        if (PlaceholderAPIHooker.isEnabled() && hasPlaceholders(temp)) {
-            var toReplace = temp;
-            temp =
+        if (PlaceholderAPIHooker.isEnabled() && hasPlaceholders(nextLine)) {
+            var toReplace = nextLine;
+            nextLine =
                     CompletableFuture.supplyAsync(
                             () -> PlaceholderAPIHooker.run(player, toReplace),
                             Bukkit.getScheduler().getMainThreadExecutor(ScoreboardPlugin.getPlugin())
                     ).join();
         }
 
-        temp = LengthChecker.check(temp);
+        nextLine = LengthChecker.check(nextLine);
 
-        currentLine = LegacyComponentSerializer.legacyAmpersand().deserialize(temp);
+        currentLine = LegacyComponentSerializer.legacyAmpersand().deserialize(nextLine);
     }
 
     public boolean isChanged() {

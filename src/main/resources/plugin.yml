@@ -3,10 +3,10 @@ main: net.okocraft.scoreboard.ScoreboardPlugin
 version: ${project.version}
 api-version: "1.17"
 author: Siroshun09
-softdepend: [PlaceholderAPI]
+softdepend: [ PlaceholderAPI ]
 commands:
   sboard:
-    aliases: ["sb"]
+    aliases: [ "sb" ]
 permissions:
   scoreboard.command:
     default: op

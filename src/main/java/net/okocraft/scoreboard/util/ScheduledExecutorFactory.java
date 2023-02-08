@@ -18,7 +18,7 @@ public final class ScheduledExecutorFactory {
 
     private static @NotNull ThreadFactory createThreadFactory() {
         return new ThreadFactoryBuilder()
-                .setNameFormat("Scoreaboard Thread - %d")
+                .setNameFormat("Scoreboard Thread - %d")
                 .setUncaughtExceptionHandler(ScheduledExecutorFactory::catchUncaughtException)
                 .setDaemon(true)
                 .build();

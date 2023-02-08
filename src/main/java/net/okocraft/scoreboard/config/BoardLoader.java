@@ -10,16 +10,15 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 final class BoardLoader {
-
-    private static final String DEFAULT_BOARD_FILE_NAME = "default.yml";
 
     private static final String PATH_TITLE = "title";
     private static final String PATH_LINE = "line";
@@ -39,47 +38,47 @@ final class BoardLoader {
             plugin.getLogger().log(Level.SEVERE, "Could not load default.yml", e);
         }
 
-        return getBoard(yaml);
+        return createBoardFromYaml(yaml);
     }
 
     static @NotNull @Unmodifiable List<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) {
         Path dirPath = plugin.getDataFolder().toPath().resolve("boards");
 
-        if (Files.exists(dirPath)) {
-            try {
-                return Files.list(dirPath)
-                        .filter(Files::isRegularFile)
-                        .filter(Files::isReadable)
-                        .filter(p -> !p.toString().endsWith(DEFAULT_BOARD_FILE_NAME))
-                        .map(YamlConfiguration::create)
-                        .map(yaml -> {
-                            try {
-                                yaml.load();
-                                return yaml;
-                            } catch (IOException e) {
-                                plugin.getLogger().log(Level.SEVERE, "Could not load " + yaml.getPath().getFileName(), e);
-                                return null;
-                            }
-                        })
-                        .filter(Objects::nonNull)
-                        .map(BoardLoader::getBoard)
-                        .collect(Collectors.toList());
-            } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not load board files", e);
-                return Collections.emptyList();
-            }
-        } else {
+        if (!Files.exists(dirPath)) {
             try {
                 Files.createDirectories(dirPath);
-                return Collections.emptyList();
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Could not create board directory", e);
-                return Collections.emptyList();
             }
+
+            return Collections.emptyList();
+        }
+
+        try (var listStream = Files.list(dirPath)) {
+            return listStream
+                    .filter(Files::isRegularFile)
+                    .filter(Files::isReadable)
+                    .filter(p -> checkFilename(p.getFileName().toString()))
+                    .map(YamlConfiguration::create)
+                    .map(yaml -> {
+                        try {
+                            yaml.load();
+                            return yaml;
+                        } catch (IOException e) {
+                            plugin.getLogger().log(Level.SEVERE, "Could not load " + yaml.getPath().getFileName(), e);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .map(BoardLoader::createBoardFromYaml)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not load board files", e);
+            return Collections.emptyList();
         }
     }
 
-    private static @NotNull Board getBoard(@NotNull YamlConfiguration yaml) {
+    private static @NotNull Board createBoardFromYaml(@NotNull YamlConfiguration yaml) {
         List<String> titleList = yaml.getStringList(PATH_TITLE + PATH_LIST_SUFFIX);
         Line title;
 
@@ -96,9 +95,10 @@ final class BoardLoader {
         if (section == null) {
             lines = Collections.emptyList();
         } else {
-            lines = new LinkedList<>();
+            var rootKeys = section.getKeyList();
+            lines = new ArrayList<>(rootKeys.size());
 
-            for (String root : section.getKeyList()) {
+            for (String root : rootKeys) {
                 List<String> lineList = section.getStringList(root + PATH_LIST_SUFFIX);
 
                 if (lineList.isEmpty()) {
@@ -112,5 +112,15 @@ final class BoardLoader {
         var name = yaml.getPath().getFileName().toString();
 
         return new Board(name.substring(0, name.lastIndexOf('.')), title, lines);
+    }
+
+    private static boolean checkFilename(String filename) {
+        var boardName = filename.substring(0, filename.lastIndexOf('.'));
+        return isYaml(filename) && !boardName.equals("default");
+    }
+
+    private static boolean isYaml(String filename) {
+        var checking = filename.toLowerCase(Locale.ENGLISH);
+        return (checking.endsWith(".yml") && 4 < checking.length()) || (checking.endsWith(".yaml") && 5 < checking.length());
     }
 }

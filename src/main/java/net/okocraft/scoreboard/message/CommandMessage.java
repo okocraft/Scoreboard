@@ -43,7 +43,7 @@ public final class CommandMessage {
 
     public static final DoubleArgument<Board, Player> SHOW_BOARD_OTHER =
             (board, target) ->
-                    translatable("scoreboard.show.self", GRAY)
+                    translatable("scoreboard.show.other", GRAY)
                             .args(
                                     text(board.getName(), AQUA),
                                     text(target.getName(), AQUA)
@@ -57,7 +57,7 @@ public final class CommandMessage {
 
     public static final SingleArgument<Player> HIDE_OTHER =
             target ->
-                    translatable("scoreboard.show.self", GRAY)
+                    translatable("scoreboard.hide.other", GRAY)
                             .args(
                                     text(target.getName(), AQUA)
                             );

@@ -9,6 +9,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class HideCommand extends AbstractCommand {
@@ -64,5 +67,19 @@ public class HideCommand extends AbstractCommand {
         } else {
             sender.sendMessage(CommandMessage.HIDE_OTHER.apply(target));
         }
+    }
+
+    @Override
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+        if (!sender.hasPermission(getPermissionNode())) {
+            return Collections.emptyList();
+        }
+
+        if (args.length == 2 && sender.hasPermission(HIDE_PERMISSION_OTHER)) {
+            var filter = args[1].toLowerCase(Locale.ENGLISH);
+            return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.startsWith(filter)).toList();
+        }
+
+        return Collections.emptyList();
     }
 }

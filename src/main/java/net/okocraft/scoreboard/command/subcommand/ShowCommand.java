@@ -12,6 +12,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class ShowCommand extends AbstractCommand {
@@ -77,6 +81,32 @@ public class ShowCommand extends AbstractCommand {
         } else {
             sender.sendMessage(CommandMessage.SHOW_BOARD_OTHER.apply(board, target));
         }
+    }
+
+    @Override
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+        if (!sender.hasPermission(getPermissionNode())) {
+            return Collections.emptyList();
+        }
+
+        if (args.length == 2) {
+            var result = new ArrayList<String>();
+            var filter = args[1].toLowerCase(Locale.ENGLISH);
+
+            if ("default".startsWith(filter)) {
+                result.add("default");
+            }
+
+            boardManager.getCustomBoards().stream().map(Board::getName).filter(name -> name.startsWith(filter)).forEach(result::add);
+            return result;
+        }
+
+        if (args.length == 3 && sender.hasPermission(SHOW_PERMISSION_OTHER)) {
+            var filter = args[2].toLowerCase(Locale.ENGLISH);
+            return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.startsWith(filter)).toList();
+        }
+
+        return Collections.emptyList();
     }
 
     private @Nullable Board searchForBoard(@NotNull String name) {

@@ -100,12 +100,12 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (displayManager != null) {
-            displayManager.hideAllBoards();
-        }
-
         if (playerListener != null) {
             playerListener.unregister();
+        }
+
+        if (displayManager != null) {
+            displayManager.hideAllBoards();
         }
 
         if (pluginListener != null) {

@@ -13,8 +13,11 @@ import java.util.concurrent.CompletableFuture;
 
 public class BukkitDisplayManager extends AbstractDisplayManager {
 
+    private final ScoreboardPlugin plugin;
+
     public BukkitDisplayManager(@NotNull ScoreboardPlugin plugin) {
-        super(plugin);
+        super(plugin.getBoardManager());
+        this.plugin = plugin;
     }
 
     @Override

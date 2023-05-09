@@ -89,8 +89,6 @@ public class LineDisplay {
             }
         }
 
-        processing = LengthChecker.check(processing);
-
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(processing);
+        return LengthChecker.check(LegacyComponentSerializer.legacyAmpersand().deserialize(processing));
     }
 }

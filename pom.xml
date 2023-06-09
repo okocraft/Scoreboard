@@ -6,7 +6,7 @@
 
     <groupId>net.okocraft.scoreboard</groupId>
     <artifactId>scoreboard</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.3</version>
 
     <name>Scoreboard</name>
     <url>https://github.com/okocraft/Scoreboard</url>

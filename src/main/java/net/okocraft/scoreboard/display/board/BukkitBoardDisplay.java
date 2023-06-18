@@ -5,7 +5,6 @@ import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
 import net.okocraft.scoreboard.task.UpdateTask;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -54,8 +53,7 @@ public class BukkitBoardDisplay implements BoardDisplay {
 
             Team team = scoreboard.registerNewTeam(line.getName());
 
-            @SuppressWarnings("deprecation")
-            var entryName = ChatColor.values()[i].toString();
+            var entryName = ENTRY_NAMES.get(i);
 
             team.addEntry(entryName);
             team.prefix(line.getCurrentLine());

@@ -30,7 +30,7 @@ public class PlayerListener implements Listener {
         var player = event.getPlayer();
 
         if (player.hasPermission("scoreboard.show-on-join")) {
-            plugin.runAsync(() -> plugin.getDisplayManager().showDefaultBoard(event.getPlayer()));
+            plugin.getScheduler().runAsync(() -> plugin.getDisplayManager().showDefaultBoard(event.getPlayer()));
         }
     }
 

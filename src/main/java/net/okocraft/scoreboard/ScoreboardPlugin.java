@@ -11,9 +11,8 @@ import net.okocraft.scoreboard.display.manager.DisplayManager;
 import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
-import net.okocraft.scoreboard.task.UpdateTask;
 import net.okocraft.scoreboard.util.LengthChecker;
-import net.okocraft.scoreboard.util.ScheduledExecutorFactory;
+import net.okocraft.scoreboard.util.scheduler.Scheduler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -22,14 +21,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class ScoreboardPlugin extends JavaPlugin {
-
-    private static final long MILLISECONDS_PER_TICK = 50;
 
     private static ScoreboardPlugin INSTANCE;
 
@@ -45,7 +39,7 @@ public class ScoreboardPlugin extends JavaPlugin {
                     .onDirectoryCreated(this::saveDefaultLanguages)
                     .build();
 
-    private final ScheduledExecutorService scheduler = ScheduledExecutorFactory.create(3);
+    private final Scheduler scheduler = Scheduler.create();
 
     private BoardManager boardManager;
     private DisplayManager displayManager;
@@ -95,7 +89,7 @@ public class ScoreboardPlugin extends JavaPlugin {
             command.setTabCompleter(impl);
         }
 
-        runAsync(this::showDefaultBoardToOnlinePlayers);
+        scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
     }
 
     @Override
@@ -112,7 +106,7 @@ public class ScoreboardPlugin extends JavaPlugin {
             pluginListener.unregister();
         }
 
-        scheduler.shutdownNow();
+        scheduler.shutdown();
     }
 
     public void reload() {
@@ -127,7 +121,11 @@ public class ScoreboardPlugin extends JavaPlugin {
         loadConfig();
         boardManager.reload();
 
-        runAsync(this::showDefaultBoardToOnlinePlayers);
+        scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
+    }
+
+    public @NotNull Scheduler getScheduler() {
+        return scheduler;
     }
 
     @NotNull
@@ -145,26 +143,6 @@ public class ScoreboardPlugin extends JavaPlugin {
         }
 
         return displayManager;
-    }
-
-    public void runAsync(@NotNull Runnable runnable) {
-        scheduler.submit(wrapTask(runnable));
-    }
-
-    @NotNull
-    public ScheduledFuture<?> scheduleUpdateTask(@NotNull UpdateTask task, long tick) {
-        long interval = tick * MILLISECONDS_PER_TICK;
-        return scheduler.scheduleWithFixedDelay(wrapTask(task), interval, interval, TimeUnit.MILLISECONDS);
-    }
-
-    private @NotNull Runnable wrapTask(@NotNull Runnable task) {
-        return () -> {
-            try {
-                task.run();
-            } catch (Throwable e) {
-                getLogger().log(Level.SEVERE, null, e);
-            }
-        };
     }
 
     public void printPlaceholderIsAvailable() {

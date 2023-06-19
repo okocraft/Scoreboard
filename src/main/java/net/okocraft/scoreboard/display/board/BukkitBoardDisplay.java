@@ -5,6 +5,7 @@ import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
 import net.okocraft.scoreboard.task.UpdateTask;
+import net.okocraft.scoreboard.util.scheduler.Task;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 
 public class BukkitBoardDisplay implements BoardDisplay {
 
@@ -31,7 +31,7 @@ public class BukkitBoardDisplay implements BoardDisplay {
     private final LineDisplay title;
     private final List<LineDisplay> lines;
 
-    private final List<ScheduledFuture<?>> updateTasks = new ArrayList<>(MAX_LINES);
+    private final List<Task> updateTasks = new ArrayList<>(MAX_LINES);
 
     public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board,
                               @NotNull Player player, @NotNull Scoreboard scoreboard) {
@@ -127,11 +127,11 @@ public class BukkitBoardDisplay implements BoardDisplay {
     }
 
     private void cancelUpdateTasks() {
-        updateTasks.stream().filter(t -> !t.isCancelled()).forEach(t -> t.cancel(true));
+        updateTasks.forEach(Task::cancel);
         updateTasks.clear();
     }
 
-    private ScheduledFuture<?> scheduleUpdateTask(@NotNull LineDisplay display, boolean isTitleLine, long interval) {
-        return plugin.scheduleUpdateTask(new UpdateTask(this, display, isTitleLine), interval);
+    private Task scheduleUpdateTask(@NotNull LineDisplay display, boolean isTitleLine, long interval) {
+        return plugin.getScheduler().scheduleUpdateTask(new UpdateTask(this, display, isTitleLine), interval);
     }
 }

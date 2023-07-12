@@ -7,7 +7,7 @@ lines:
   empty-1:
     interval: 0
     list: [ ]
-  server-uptime:
+  server-uptime: # Requires PlaceholderAPI and Server Expansion
     interval: 20
     list:
       - " &7Uptime: &b%server_uptime%"

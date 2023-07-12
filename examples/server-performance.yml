@@ -1,0 +1,40 @@
+title:
+  interval: 0
+  list:
+    - "&8&m=====&e&l Server Performance &8&m====="
+
+lines:
+  empty-1:
+    interval: 0
+    list: [ ]
+  server-uptime:
+    interval: 20
+    list:
+      - " &7Uptime: &b%server_uptime%"
+  player-count:
+    interval: 10
+    list:
+      - " &7Login: &b%server_online% players"
+  player-ping:
+    interval: 20
+    list:
+      - " &7Ping: &b%player_ping%ms"
+  server-tps:
+    interval: 20
+    list:
+      - " &7TPS: &b%server_tps%"
+  server-ram: # Requires PlaceholderAPI and Server Expansion
+    interval: 20
+    list:
+      - " &7RAM: &b%server_ram_used%/%server_ram_total%MB"
+  server-chunks: # Requires PlaceholderAPI and Server Expansion
+    interval: 20
+    list:
+      - " &7Chunks: &b%server_total_chunks%"
+  server-entities: # Requires PlaceholderAPI and Server Expansion
+    interval: 20
+    list:
+      - " &7Entities: &b%server_total_entities%"
+  empty-2:
+    interval: 0
+    list: [ ]

@@ -4,16 +4,18 @@
 # (Structure)
 # title:
 #   interval: <ticks to update the title>
+#   length-limit: <the max length of the title, overrides the config.yml setting>
 #   list:
 #     - "<contents to be displayed>"
 #
 # lines:
 #   <unique name>:
 #     interval: <ticks to update this line>
+#     length-limit: <the max length of this line, overrides the config.yml setting>
 #     list:
 #       - "<contents to be displayed>"
 #
-# If the "interval" is equals or less than 0, the title will never be updated.
+# If the "interval" is equals or less than 0 or "list" is empty, the title will never be updated.
 #
 # Contents can be colored by Legacy Color Format (using &a for named colors and styles, or &#xxxxxx for hex colors),
 # and placeholders can also be used.

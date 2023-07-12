@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 final class BoardLoader {
 
     private static final String PATH_TITLE = "title";
-    private static final String PATH_LINE = "line";
+    private static final String PATH_LINES = "lines";
+    private static final String LEGACY_PATH_LINE = "line";
     private static final String PATH_LIST_SUFFIX = ".list";
     private static final String PATH_INTERVAL_SUFFIX = ".interval";
 
@@ -88,7 +89,11 @@ final class BoardLoader {
             title = new Line(titleList, yaml.getLong(PATH_TITLE + PATH_INTERVAL_SUFFIX));
         }
 
-        var section = yaml.getSection(PATH_LINE);
+        var section = yaml.getSection(LEGACY_PATH_LINE);
+
+        if (section == null) {
+            section = yaml.getSection(PATH_LINES);
+        }
 
         List<Line> lines;
 

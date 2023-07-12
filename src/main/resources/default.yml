@@ -8,10 +8,7 @@ title:
     - "&8&m=====&e&l Server &8&m====="
     - "&8&m=====&f&l Server &8&m====="
 
-# Built-in placeholders (PlaceholderAPI not required):
-# %server_tps% %server_online%
-# %player_name% %player_displayname% %player_world% %player_block_x% %player_block_y% %player_block_z% %player_ping%
-line:
+lines:
   empty-1:
     interval: 0
     list:

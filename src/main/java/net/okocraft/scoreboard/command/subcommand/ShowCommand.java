@@ -47,6 +47,11 @@ public class ShowCommand extends AbstractCommand {
                 sender.sendMessage(CommandMessage.BOARD_NOT_FOUND.apply(args[1]));
                 return;
             }
+
+            if (!sender.hasPermission(board.getPermissionNode())) {
+                sender.sendMessage(CommandMessage.NO_PERMISSION.apply(board.getPermissionNode()));
+                return;
+            }
         } else {
             board = boardManager.getDefaultBoard();
         }
@@ -97,7 +102,11 @@ public class ShowCommand extends AbstractCommand {
                 result.add("default");
             }
 
-            boardManager.getCustomBoards().stream().map(Board::getName).filter(name -> name.startsWith(filter)).forEach(result::add);
+            boardManager.getCustomBoards().stream()
+                    .filter(board -> sender.hasPermission(board.getPermissionNode()))
+                    .map(Board::getName)
+                    .filter(name -> name.startsWith(filter))
+                    .forEach(result::add);
             return result;
         }
 

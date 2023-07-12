@@ -1,7 +1,7 @@
 title:
   interval: 0
   list:
-    - "&8&m=====&e&l Server Performance &8&m====="
+    - "&8&m===&e&l Server Performance &8&m==="
 
 lines:
   empty-1:
@@ -23,7 +23,7 @@ lines:
     interval: 20
     list:
       - " &7TPS: &b%server_tps%"
-  server-ram: # Requires PlaceholderAPI and Server Expansion
+  server-ram:
     interval: 20
     list:
       - " &7RAM: &b%server_ram_used%/%server_ram_total%MB"

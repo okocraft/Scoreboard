@@ -24,6 +24,10 @@
 #
 # - %server_tps% - The current server TPS (Ticks Per Second)
 # - %server_online% - The current online players
+# - %server_ram_used% - The amount of used memory (MB)
+# - %server_ram_free% - The amount of free memory (MB)
+# - %server_ram_total% - The amount of total memory (MB)
+# - %server_ram_max% - The amount of max memory (MB)
 # - %player_name% - The name of the viewer
 # - %player_displayname% - The display name of the viewer
 # - %player_world% - The name of the world where the viewer is in

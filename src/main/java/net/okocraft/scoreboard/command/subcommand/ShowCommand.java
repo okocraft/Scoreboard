@@ -103,7 +103,10 @@ public class ShowCommand extends AbstractCommand {
 
         if (args.length == 3 && sender.hasPermission(SHOW_PERMISSION_OTHER)) {
             var filter = args[2].toLowerCase(Locale.ENGLISH);
-            return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.startsWith(filter)).toList();
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .filter(name -> name.toLowerCase(Locale.ENGLISH).startsWith(filter))
+                    .toList();
         }
 
         return Collections.emptyList();

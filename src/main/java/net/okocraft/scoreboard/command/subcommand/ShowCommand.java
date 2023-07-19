@@ -48,7 +48,7 @@ public class ShowCommand extends AbstractCommand {
                 return;
             }
 
-            if (!sender.hasPermission(board.getPermissionNode())) {
+            if (!args[0].equalsIgnoreCase("default") && !sender.hasPermission(board.getPermissionNode())) {
                 sender.sendMessage(CommandMessage.NO_PERMISSION.apply(board.getPermissionNode()));
                 return;
             }

@@ -1,6 +1,6 @@
 package net.okocraft.scoreboard.display.board;
 
-import net.kyori.adventure.text.Component;
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
@@ -12,7 +12,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -49,19 +48,13 @@ public class BukkitBoardDisplay implements BoardDisplay {
         var lines = new ArrayList<LineDisplay>(size);
 
         for (int i = 0; i < size; i++) {
-            LineDisplay line = new LineDisplay(player, board.getLines().get(i), i);
-
-            Team team = scoreboard.registerNewTeam(line.getName());
-
-            var entryName = ENTRY_NAMES.get(i);
-
-            team.addEntry(entryName);
-            team.prefix(line.getCurrentLine());
-            team.suffix(Component.empty());
-
-            objective.getScore(entryName).setScore(size - i);
-
+            var line = new LineDisplay(player, board.getLines().get(i), i);
             lines.add(line);
+
+            var score = objective.getScore(line.getName());
+            score.setScore(size - i);
+            score.numberFormat(NumberFormat.blank());
+            score.customName(line.getCurrentLine());
         }
 
         this.lines = Collections.unmodifiableList(lines);
@@ -94,11 +87,7 @@ public class BukkitBoardDisplay implements BoardDisplay {
     @Override
     public void applyLine(@NotNull LineDisplay line) {
         if (line.isChanged()) {
-            Team team = scoreboard.getTeam(line.getName());
-
-            if (team != null) {
-                team.prefix(line.getCurrentLine());
-            }
+            objective.getScore(line.getName()).customName(line.getCurrentLine());
         }
     }
 

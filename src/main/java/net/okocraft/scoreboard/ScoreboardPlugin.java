@@ -2,8 +2,12 @@ package net.okocraft.scoreboard;
 
 import com.github.siroshun09.configapi.api.util.ResourceUtils;
 import com.github.siroshun09.configapi.yaml.YamlConfiguration;
-import com.github.siroshun09.translationloader.directory.TranslationDirectory;
-import net.kyori.adventure.key.Key;
+import com.github.siroshun09.messages.api.directory.DirectorySource;
+import com.github.siroshun09.messages.api.directory.MessageProcessors;
+import com.github.siroshun09.messages.api.source.StringMessageMap;
+import com.github.siroshun09.messages.api.util.PropertiesFile;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.okocraft.scoreboard.command.ScoreboardCommand;
 import net.okocraft.scoreboard.config.BoardManager;
 import net.okocraft.scoreboard.display.line.LineDisplay;
@@ -12,15 +16,18 @@ import net.okocraft.scoreboard.display.manager.DisplayManager;
 import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
+import net.okocraft.scoreboard.message.Messages;
 import net.okocraft.scoreboard.util.scheduler.Scheduler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class ScoreboardPlugin extends JavaPlugin {
@@ -31,16 +38,9 @@ public class ScoreboardPlugin extends JavaPlugin {
         return Objects.requireNonNull(INSTANCE);
     }
 
-    private final TranslationDirectory translationDirectory =
-            TranslationDirectory.newBuilder()
-                    .setKey(Key.key("scoreboard:languages"))
-                    .setDirectory(getDataFolder().toPath().resolve("languages"))
-                    .setDefaultLocale(Locale.ENGLISH)
-                    .onDirectoryCreated(this::saveDefaultLanguages)
-                    .build();
-
     private final Scheduler scheduler = Scheduler.create();
 
+    private MiniMessageLocalization localization;
     private BoardManager boardManager;
     private DisplayManager displayManager;
     private PlayerListener playerListener;
@@ -57,7 +57,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         }
 
         try {
-            translationDirectory.load();
+            this.loadMessages();
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Could not load languages", e);
         }
@@ -109,23 +109,31 @@ public class ScoreboardPlugin extends JavaPlugin {
         scheduler.shutdown();
     }
 
-    public void reload() {
+    public boolean reload(@NotNull Consumer<Throwable> exceptionConsumer) {
         displayManager.hideAllBoards();
 
         try {
-            translationDirectory.load();
+            this.loadMessages();
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Could not load languages", e);
+            exceptionConsumer.accept(e);
+            return false;
         }
 
+        // TODO: exception handling
         loadConfig();
         boardManager.reload();
 
         scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
+        return true;
     }
 
     public @NotNull Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public @NotNull MiniMessageLocalization getLocalization() {
+        return this.localization;
     }
 
     @NotNull
@@ -168,12 +176,30 @@ public class ScoreboardPlugin extends JavaPlugin {
         }
     }
 
-    private void saveDefaultLanguages(@NotNull Path directory) throws IOException {
-        var english = "en.yml";
-        ResourceUtils.copyFromJarIfNotExists(getFile().toPath(), english, directory.resolve(english));
+    private void loadMessages() throws IOException {
+        if (this.localization == null) { // on startup
+            this.localization = new MiniMessageLocalization(MiniMessageSource.create(StringMessageMap.create(Messages.defaultMessages())), Messages::getLocaleFrom);
+        } else { // on reload
+            this.localization.clearSources();
+        }
 
-        var japanese = "ja_JP.yml";
-        ResourceUtils.copyFromJarIfNotExists(getFile().toPath(), japanese, directory.resolve(japanese));
+        DirectorySource.forStringMessageMap(this.getDataFolder().toPath().resolve("languages"))
+                .fileExtension(PropertiesFile.FILE_EXTENSION)
+                .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
+                .messageLoader(PropertiesFile.DEFAULT_LOADER)
+                .messageProcessor(MessageProcessors.appendMissingStringMessages(this::loadDefaultMessageMap, PropertiesFile.DEFAULT_APPENDER))
+                .messageProcessor(loaded -> MiniMessageSource.create(loaded.messageSource()))
+                .load(loaded -> this.localization.addSource(loaded.locale(), loaded.messageSource()));
+    }
+
+    private @Nullable Map<String, String> loadDefaultMessageMap(@NotNull Locale locale) throws IOException {
+        if (locale.equals(Locale.ENGLISH)) {
+            return Messages.defaultMessages();
+        } else {
+            try (var input = this.getResource(locale + ".properties")) {
+                return input != null ? PropertiesFile.load(input) : null;
+            }
+        }
     }
 
     private void showDefaultBoardToOnlinePlayers() {

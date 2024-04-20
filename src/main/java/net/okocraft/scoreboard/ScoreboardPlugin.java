@@ -1,7 +1,6 @@
 package net.okocraft.scoreboard;
 
-import com.github.siroshun09.configapi.api.util.ResourceUtils;
-import com.github.siroshun09.configapi.yaml.YamlConfiguration;
+import com.github.siroshun09.configapi.format.yaml.YamlFormat;
 import com.github.siroshun09.messages.api.directory.DirectorySource;
 import com.github.siroshun09.messages.api.directory.MessageProcessors;
 import com.github.siroshun09.messages.api.source.StringMessageMap;
@@ -24,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -39,9 +40,10 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     private final Scheduler scheduler = Scheduler.create();
+    private final BoardManager boardManager = new BoardManager(this);
 
+    private boolean boardLoaded;
     private MiniMessageLocalization localization;
-    private BoardManager boardManager;
     private DisplayManager displayManager;
     private PlayerListener playerListener;
     private PluginListener pluginListener;
@@ -50,21 +52,8 @@ public class ScoreboardPlugin extends JavaPlugin {
     public void onLoad() {
         INSTANCE = this;
 
-        try {
-            saveDefaultFiles();
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not save default files", e);
-        }
-
-        try {
-            this.loadMessages();
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not load languages", e);
-        }
-
-        loadConfig();
-        boardManager = new BoardManager(this);
-        boardManager.reload();
+        this.boardLoaded =this.reloadSettings(ex -> {
+        });
     }
 
     @Override
@@ -89,7 +78,9 @@ public class ScoreboardPlugin extends JavaPlugin {
             command.setTabCompleter(impl);
         }
 
-        scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
+        if (this.boardLoaded) {
+            scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
+        }
     }
 
     @Override
@@ -112,6 +103,23 @@ public class ScoreboardPlugin extends JavaPlugin {
     public boolean reload(@NotNull Consumer<Throwable> exceptionConsumer) {
         displayManager.hideAllBoards();
 
+        if (this.reloadSettings(exceptionConsumer)) {
+            scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean reloadSettings(@NotNull Consumer<Throwable> exceptionConsumer) {
+        try {
+            this.loadConfig();
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Could not load config.yml", e);
+            exceptionConsumer.accept(e);
+            return false;
+        }
+
         try {
             this.loadMessages();
         } catch (IOException e) {
@@ -120,11 +128,14 @@ public class ScoreboardPlugin extends JavaPlugin {
             return false;
         }
 
-        // TODO: exception handling
-        loadConfig();
-        boardManager.reload();
+        try {
+            this.boardManager.reload();
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Could not load boards", e);
+            exceptionConsumer.accept(e);
+            return false;
+        }
 
-        scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
         return true;
     }
 
@@ -138,15 +149,11 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @NotNull
     public BoardManager getBoardManager() {
-        if (boardManager == null) {
-            throw new IllegalStateException();
-        }
-
         return boardManager;
     }
 
     public DisplayManager getDisplayManager() {
-        if (boardManager == null) {
+        if (displayManager == null) {
             throw new IllegalStateException();
         }
 
@@ -157,23 +164,22 @@ public class ScoreboardPlugin extends JavaPlugin {
         getLogger().info("PlaceholderAPI is available!");
     }
 
-    private void saveDefaultFiles() throws IOException {
-        ResourceUtils.copyFromJarIfNotExists(
-                getFile().toPath(), "config.yml", getDataFolder().toPath().resolve("config.yml")
-        );
-
-        ResourceUtils.copyFromJarIfNotExists(
-                getFile().toPath(), "default.yml", getDataFolder().toPath().resolve("default.yml")
-        );
+    public Path saveResource(String filename) throws IOException {
+        var filepath = this.getDataFolder().toPath().resolve(filename);
+        if (!Files.isRegularFile(filepath)) {
+            try (var input = this.getResource(filename)) {
+                if (input == null) {
+                    throw new IllegalStateException(filename + " was not found in the jar.");
+                }
+                Files.copy(input, filepath);
+            }
+        }
+        return filepath;
     }
 
-    private void loadConfig() {
-        try (var config = YamlConfiguration.create(getDataFolder().toPath().resolve("config.yml"))) {
-            config.load();
-            LineDisplay.globalLengthLimit = Math.max(config.getInteger("max-line-length", 32), 1);
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not load config.yml", e);
-        }
+    private void loadConfig() throws IOException {
+        var config = YamlFormat.DEFAULT.load(this.saveResource("config.yml"));
+        LineDisplay.globalLengthLimit = Math.max(config.getInteger("max-line-length", 32), 1);
     }
 
     private void loadMessages() throws IOException {

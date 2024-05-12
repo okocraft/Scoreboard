@@ -116,6 +116,7 @@
                         </manifest>
                         <manifestEntries>
                             <Automatic-Module-Name>net.okocraft.scoreboard</Automatic-Module-Name>
+                            <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
                         </manifestEntries>
                     </archive>
                 </configuration>

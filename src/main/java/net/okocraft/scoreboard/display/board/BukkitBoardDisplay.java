@@ -1,11 +1,11 @@
 package net.okocraft.scoreboard.display.board;
 
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import io.papermc.paper.util.Tick;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
-import net.okocraft.scoreboard.task.UpdateTask;
-import net.okocraft.scoreboard.util.scheduler.Task;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BukkitBoardDisplay implements BoardDisplay {
 
@@ -30,7 +31,7 @@ public class BukkitBoardDisplay implements BoardDisplay {
     private final LineDisplay title;
     private final List<LineDisplay> lines;
 
-    private final List<Task> updateTasks = new ArrayList<>(MAX_LINES);
+    private final List<ScheduledTask> updateTasks = new ArrayList<>(MAX_LINES);
 
     public BukkitBoardDisplay(@NotNull ScoreboardPlugin plugin, @NotNull Board board,
                               @NotNull Player player, @NotNull Scoreboard scoreboard) {
@@ -116,11 +117,21 @@ public class BukkitBoardDisplay implements BoardDisplay {
     }
 
     private void cancelUpdateTasks() {
-        updateTasks.forEach(Task::cancel);
+        updateTasks.forEach(ScheduledTask::cancel);
         updateTasks.clear();
     }
 
-    private Task scheduleUpdateTask(@NotNull LineDisplay display, boolean isTitleLine, long interval) {
-        return plugin.getScheduler().scheduleUpdateTask(new UpdateTask(this, display, isTitleLine), interval);
+    private ScheduledTask scheduleUpdateTask(@NotNull LineDisplay display, boolean isTitleLine, long ticks) {
+        long interval = Tick.of(ticks).toMillis();
+        return this.player.getServer().getAsyncScheduler().runAtFixedRate(this.plugin, ignored -> this.update(display, isTitleLine), interval, interval, TimeUnit.MILLISECONDS);
+    }
+
+    private void update(@NotNull LineDisplay line, boolean isTitle) {
+        line.update();
+        if (isTitle) {
+            this.applyTitle();
+        } else {
+            this.applyLine(line);
+        }
     }
 }

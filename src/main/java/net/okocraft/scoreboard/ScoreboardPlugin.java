@@ -19,7 +19,6 @@ import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
 import net.okocraft.scoreboard.message.Messages;
-import net.okocraft.scoreboard.util.scheduler.Scheduler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +41,10 @@ public class ScoreboardPlugin extends JavaPlugin {
         return Objects.requireNonNull(INSTANCE);
     }
 
-    private final Scheduler scheduler = Scheduler.create();
     private final PlaceholderProvider placeholderProvider = new PlaceholderProvider(PlaceholderAPIHooker::createPlaceholder);
     private final LineFormat.Compiler lineCompiler = LineFormat.compiler(this.placeholderProvider);
     private final BoardManager boardManager = new BoardManager(this);
 
-    private boolean boardLoaded;
     private MiniMessageLocalization localization;
     private DisplayManager displayManager;
     private PlayerListener playerListener;
@@ -59,8 +56,7 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         Placeholder.registerDefaults(this.placeholderProvider);
 
-        this.boardLoaded = this.reloadSettings(ex -> {
-        });
+        this.reloadSettings(ex -> {});
     }
 
     @Override
@@ -84,10 +80,6 @@ public class ScoreboardPlugin extends JavaPlugin {
             command.setExecutor(impl);
             command.setTabCompleter(impl);
         }
-
-        if (this.boardLoaded) {
-            scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
-        }
     }
 
     @Override
@@ -104,21 +96,10 @@ public class ScoreboardPlugin extends JavaPlugin {
             pluginListener.unregister();
         }
 
-        scheduler.shutdown();
+        this.getServer().getAsyncScheduler().cancelTasks(this);
     }
 
-    public boolean reload(@NotNull Consumer<Throwable> exceptionConsumer) {
-        displayManager.hideAllBoards();
-
-        if (this.reloadSettings(exceptionConsumer)) {
-            scheduler.runAsync(this::showDefaultBoardToOnlinePlayers);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean reloadSettings(@NotNull Consumer<Throwable> exceptionConsumer) {
+    public boolean reloadSettings(@NotNull Consumer<Throwable> exceptionConsumer) {
         try {
             this.loadConfig();
         } catch (IOException e) {
@@ -144,10 +125,6 @@ public class ScoreboardPlugin extends JavaPlugin {
         }
 
         return true;
-    }
-
-    public @NotNull Scheduler getScheduler() {
-        return scheduler;
     }
 
     public @NotNull PlaceholderProvider getPlaceholderProvider() {
@@ -219,12 +196,5 @@ public class ScoreboardPlugin extends JavaPlugin {
                 return input != null ? PropertiesFile.load(input) : null;
             }
         }
-    }
-
-    private void showDefaultBoardToOnlinePlayers() {
-        getServer().getOnlinePlayers()
-                .stream()
-                .filter(player -> player.hasPermission("scoreboard.show-on-join"))
-                .forEach(displayManager::showDefaultBoard);
     }
 }

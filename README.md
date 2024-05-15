@@ -4,12 +4,12 @@
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/okocraft/Scoreboard/maven.yml?branch=master)
 ![GitHub](https://img.shields.io/github/license/okocraft/Scoreboard)
 
-ゲーム画面の右側にカスタマイズしたスコアボードを表示する Spigot プラグインです。
+ゲーム画面の右側にカスタマイズしたスコアボードを表示する Paper プラグインです。
 
 ## Requirements
 
 - Java 21+
-- Paper 1.17+
+- Paper 1.20.4+
 - (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 
 ## Usage
@@ -26,7 +26,7 @@ title: # 最上部に表示される
   list: # 更新するごとの表示順序
     - "&8------ &bServer &8------"
 
-line: # 表示する行設定
+lines: # 表示する行設定
   empty-1: # 一意な名前
     interval: 0
     # list を設定しない場合、空の行となる
@@ -63,4 +63,4 @@ line: # 表示する行設定
 
 This project is licensed under the permissive GPL-3.0 license. Please see [LICENSE](LICENSE) for more info.
 
-Copyright © 2019-2023, Siroshun09
+Copyright © 2019-2024, Siroshun09

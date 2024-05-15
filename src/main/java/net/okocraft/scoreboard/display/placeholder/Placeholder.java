@@ -2,6 +2,7 @@ package net.okocraft.scoreboard.display.placeholder;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +27,10 @@ public interface Placeholder {
         target.register("server_ram_max", context -> text(toMB(Runtime.getRuntime().maxMemory())));
         target.register("player_name", context -> context.viewer().name());
         target.register("player_displayname", context -> context.viewer().displayName());
-        target.register("player_world", context -> text(context.viewer().getWorld().getName()));
-        target.register("player_block_x", context -> text(NumberConversions.floor(context.viewer().getX())));
-        target.register("player_block_y", context -> text(NumberConversions.floor(context.viewer().getY())));
-        target.register("player_block_z", context -> text(NumberConversions.floor(context.viewer().getZ())));
+        target.register("player_world", context -> text(context.world().getName()));
+        target.register("player_block_x", context -> text(context.blockX()));
+        target.register("player_block_y", context -> text(context.blockY()));
+        target.register("player_block_z", context -> text(context.blockZ()));
         target.register("player_ping", context -> text(context.viewer().getPing()));
     }
 
@@ -39,6 +40,14 @@ public interface Placeholder {
 
     @NotNull Component apply(@NotNull Context context);
 
-    record Context(@NotNull Player viewer) {
+    record Context(@NotNull Player viewer, int blockX, int blockY, int blockZ) {
+
+        public Context(@NotNull Player viewer) {
+            this(viewer, NumberConversions.floor(viewer.getX()), NumberConversions.floor(viewer.getY()), NumberConversions.floor(viewer.getZ()));
+        }
+
+        public @NotNull World world() {
+            return this.viewer.getWorld();
+        }
     }
 }

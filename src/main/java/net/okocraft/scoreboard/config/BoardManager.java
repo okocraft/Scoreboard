@@ -1,8 +1,8 @@
 package net.okocraft.scoreboard.config;
 
-import com.github.siroshun09.configapi.core.node.MapNode;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
+import net.okocraft.scoreboard.board.line.Line;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class BoardManager {
 
     private final ScoreboardPlugin plugin;
 
-    private Board defaultBoard = BoardLoader.createBoardFromNode("default", MapNode.empty());
+    private Board defaultBoard = new Board("default", Line.EMPTY, Collections.emptyList());
     private List<Board> customBoards = Collections.emptyList();
 
     public BoardManager(@NotNull ScoreboardPlugin plugin) {

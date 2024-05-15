@@ -7,11 +7,14 @@ import com.github.siroshun09.messages.api.source.StringMessageMap;
 import com.github.siroshun09.messages.api.util.PropertiesFile;
 import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
+import net.okocraft.scoreboard.board.line.LineFormat;
 import net.okocraft.scoreboard.command.ScoreboardCommand;
 import net.okocraft.scoreboard.config.BoardManager;
 import net.okocraft.scoreboard.display.line.LineDisplay;
 import net.okocraft.scoreboard.display.manager.BukkitDisplayManager;
 import net.okocraft.scoreboard.display.manager.DisplayManager;
+import net.okocraft.scoreboard.display.placeholder.Placeholder;
+import net.okocraft.scoreboard.display.placeholder.PlaceholderProvider;
 import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
@@ -40,6 +43,8 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     private final Scheduler scheduler = Scheduler.create();
+    private final PlaceholderProvider placeholderProvider = new PlaceholderProvider(PlaceholderAPIHooker::createPlaceholder);
+    private final LineFormat.Compiler lineCompiler = LineFormat.compiler(this.placeholderProvider);
     private final BoardManager boardManager = new BoardManager(this);
 
     private boolean boardLoaded;
@@ -51,6 +56,8 @@ public class ScoreboardPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         INSTANCE = this;
+
+        Placeholder.registerDefaults(this.placeholderProvider);
 
         this.boardLoaded = this.reloadSettings(ex -> {
         });
@@ -141,6 +148,14 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     public @NotNull Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public @NotNull PlaceholderProvider getPlaceholderProvider() {
+        return this.placeholderProvider;
+    }
+
+    public @NotNull LineFormat.Compiler getLineCompiler() {
+        return this.lineCompiler;
     }
 
     public @NotNull MiniMessageLocalization getLocalization() {

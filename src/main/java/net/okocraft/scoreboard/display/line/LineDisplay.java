@@ -2,17 +2,11 @@ package net.okocraft.scoreboard.display.line;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.okocraft.scoreboard.ScoreboardPlugin;
-import net.okocraft.scoreboard.board.Line;
-import net.okocraft.scoreboard.display.placeholder.Placeholders;
-import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
+import net.okocraft.scoreboard.board.line.Line;
+import net.okocraft.scoreboard.display.placeholder.Placeholder;
 import net.okocraft.scoreboard.util.LengthChecker;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.CompletableFuture;
 
 public class LineDisplay {
 
@@ -33,7 +27,7 @@ public class LineDisplay {
         this.line = line;
         this.name = String.valueOf(num);
 
-        if (line.isEmpty()) {
+        if (line.lines().isEmpty()) {
             this.currentLine = Component.empty();
         } else {
             this.currentLine = processLine(0);
@@ -49,9 +43,7 @@ public class LineDisplay {
     }
 
     public void update() {
-        currentIndex++;
-
-        if (line.getMaxIndex() < currentIndex) {
+        if (line.lines().size() <= ++currentIndex) {
             currentIndex = 0;
         }
 
@@ -72,30 +64,13 @@ public class LineDisplay {
     }
 
     public long getInterval() {
-        return line.getInterval();
+        return line.interval();
     }
 
     private @NotNull TextComponent processLine(int index) {
-        var replaceResult = Placeholders.replace(player, line.get(index)); // replace built-in placeholders
-        var processing = replaceResult.replaced();
-
-        if (PlaceholderAPIHooker.isEnabled() && replaceResult.hasUnknownPlaceholders()) {
-            if (Bukkit.isPrimaryThread()) {
-                processing = PlaceholderAPIHooker.run(player, replaceResult.replaced());
-            } else {
-                processing =
-                        CompletableFuture.supplyAsync(
-                                () -> PlaceholderAPIHooker.run(player, replaceResult.replaced()),
-                                Bukkit.getScheduler().getMainThreadExecutor(ScoreboardPlugin.getPlugin())
-                        ).join();
-            }
-        }
-
-        int lengthLimit = line.getLengthLimit();
-
         return LengthChecker.check(
-                LegacyComponentSerializer.legacyAmpersand().deserialize(processing),
-                lengthLimit < 0 ? globalLengthLimit : lengthLimit
+                this.line.lines().get(index).render(new Placeholder.Context(this.player)),
+                this.line.lengthLimit(globalLengthLimit)
         );
     }
 }

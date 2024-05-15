@@ -38,17 +38,17 @@ public class BukkitBoardDisplay implements BoardDisplay {
         this.player = player;
         this.scoreboard = scoreboard;
 
-        this.title = new LineDisplay(player, board.getTitle(), 0);
+        this.title = new LineDisplay(player, board.title(), 0);
 
         objective = scoreboard.registerNewObjective("sb", Criteria.DUMMY, title.getCurrentLine(), RenderType.INTEGER);
 
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        int size = Math.min(board.getLines().size(), MAX_LINES);
+        int size = Math.min(board.lines().size(), MAX_LINES);
         var lines = new ArrayList<LineDisplay>(size);
 
         for (int i = 0; i < size; i++) {
-            var line = new LineDisplay(player, board.getLines().get(i), i);
+            var line = new LineDisplay(player, board.lines().get(i), i);
             lines.add(line);
 
             var score = objective.getScore(line.getName());

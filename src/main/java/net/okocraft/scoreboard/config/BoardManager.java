@@ -22,16 +22,16 @@ public class BoardManager {
 
     @NotNull
     public Board getDefaultBoard() {
-        return defaultBoard;
+        return this.defaultBoard;
     }
 
     @NotNull
     public List<Board> getCustomBoards() {
-        return customBoards;
+        return this.customBoards;
     }
 
     public void reload() throws IOException {
-        defaultBoard = BoardLoader.loadDefaultBoard(plugin);
-        customBoards = BoardLoader.loadCustomBoards(plugin);
+        this.defaultBoard = BoardLoader.loadDefaultBoard(this.plugin);
+        this.customBoards = BoardLoader.loadCustomBoards(this.plugin);
     }
 }

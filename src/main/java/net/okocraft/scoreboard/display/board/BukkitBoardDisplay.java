@@ -41,9 +41,9 @@ public class BukkitBoardDisplay implements BoardDisplay {
 
         this.title = new LineDisplay(player, board.title(), 0);
 
-        objective = scoreboard.registerNewObjective("sb", Criteria.DUMMY, title.getCurrentLine(), RenderType.INTEGER);
+        this.objective = scoreboard.registerNewObjective("sb", Criteria.DUMMY, this.title.getCurrentLine(), RenderType.INTEGER);
 
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         int size = Math.min(board.lines().size(), MAX_LINES);
         var lines = new ArrayList<LineDisplay>(size);
@@ -52,7 +52,7 @@ public class BukkitBoardDisplay implements BoardDisplay {
             var line = new LineDisplay(player, board.lines().get(i), i);
             lines.add(line);
 
-            var score = objective.getScore(line.getName());
+            var score = this.objective.getScore(line.getName());
             score.setScore(size - i);
             score.numberFormat(NumberFormat.blank());
             score.customName(line.getCurrentLine());
@@ -63,62 +63,62 @@ public class BukkitBoardDisplay implements BoardDisplay {
 
     @Override
     public boolean isVisible() {
-        return player.getScoreboard().equals(scoreboard);
+        return this.player.getScoreboard().equals(this.scoreboard);
     }
 
     @Override
     public void showBoard() {
-        player.setScoreboard(scoreboard);
-        scheduleUpdateTasks();
+        this.player.setScoreboard(this.scoreboard);
+        this.scheduleUpdateTasks();
     }
 
     @Override
     public void hideBoard() {
-        player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
-        cancelUpdateTasks();
+        this.player.setScoreboard(this.plugin.getServer().getScoreboardManager().getMainScoreboard());
+        this.cancelUpdateTasks();
     }
 
     @Override
     public void applyTitle() {
-        if (title.isChanged()) {
-            objective.displayName(title.getCurrentLine());
+        if (this.title.isChanged()) {
+            this.objective.displayName(this.title.getCurrentLine());
         }
     }
 
     @Override
     public void applyLine(@NotNull LineDisplay line) {
         if (line.isChanged()) {
-            objective.getScore(line.getName()).customName(line.getCurrentLine());
+            this.objective.getScore(line.getName()).customName(line.getCurrentLine());
         }
     }
 
     @Override
     @NotNull
     public LineDisplay getTitle() {
-        return title;
+        return this.title;
     }
 
     @Override
     @NotNull
     public List<LineDisplay> getLines() {
-        return lines;
+        return this.lines;
     }
 
     private void scheduleUpdateTasks() {
-        if (getTitle().shouldUpdate()) {
-            updateTasks.add(scheduleUpdateTask(getTitle(), true, getTitle().getInterval()));
+        if (this.getTitle().shouldUpdate()) {
+            this.updateTasks.add(this.scheduleUpdateTask(this.getTitle(), true, this.getTitle().getInterval()));
         }
 
-        for (LineDisplay line : getLines()) {
+        for (LineDisplay line : this.getLines()) {
             if (line.shouldUpdate()) {
-                updateTasks.add(scheduleUpdateTask(line, false, line.getInterval()));
+                this.updateTasks.add(this.scheduleUpdateTask(line, false, line.getInterval()));
             }
         }
     }
 
     private void cancelUpdateTasks() {
-        updateTasks.forEach(ScheduledTask::cancel);
-        updateTasks.clear();
+        this.updateTasks.forEach(ScheduledTask::cancel);
+        this.updateTasks.clear();
     }
 
     private ScheduledTask scheduleUpdateTask(@NotNull LineDisplay display, boolean isTitleLine, long ticks) {

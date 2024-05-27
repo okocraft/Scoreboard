@@ -30,41 +30,41 @@ public class LineDisplay {
         if (line.lines().isEmpty()) {
             this.currentLine = Component.empty();
         } else {
-            this.currentLine = processLine(0);
+            this.currentLine = this.processLine(0);
         }
     }
 
     public @NotNull String getName() {
-        return name;
+        return this.name;
     }
 
     public @NotNull TextComponent getCurrentLine() {
-        return currentLine;
+        return this.currentLine;
     }
 
     public void update() {
-        if (line.lines().size() <= ++currentIndex) {
-            currentIndex = 0;
+        if (this.line.lines().size() <= ++this.currentIndex) {
+            this.currentIndex = 0;
         }
 
-        currentLine = processLine(currentIndex);
+        this.currentLine = this.processLine(this.currentIndex);
     }
 
     public boolean isChanged() {
-        if (currentLine.equals(prevLine)) {
+        if (this.currentLine.equals(this.prevLine)) {
             return false;
         } else {
-            prevLine = currentLine;
+            this.prevLine = this.currentLine;
             return true;
         }
     }
 
     public boolean shouldUpdate() {
-        return line.shouldUpdate();
+        return this.line.shouldUpdate();
     }
 
     public long getInterval() {
-        return line.interval();
+        return this.line.interval();
     }
 
     private @NotNull TextComponent processLine(int index) {

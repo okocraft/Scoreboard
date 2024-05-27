@@ -25,18 +25,18 @@ public class BukkitDisplayManager extends AbstractDisplayManager {
         Scoreboard scoreboard;
 
         if (Bukkit.isPrimaryThread()) {
-            scoreboard = newScoreboard();
+            scoreboard = this.newScoreboard();
         } else {
             scoreboard = CompletableFuture.supplyAsync(
                     this::newScoreboard,
-                    plugin.getServer().getScheduler().getMainThreadExecutor(plugin)
+                    this.plugin.getServer().getScheduler().getMainThreadExecutor(this.plugin)
             ).join();
         }
 
-        return new BukkitBoardDisplay(plugin, board, player, scoreboard);
+        return new BukkitBoardDisplay(this.plugin, board, player, scoreboard);
     }
 
     private @NotNull Scoreboard newScoreboard() {
-        return plugin.getServer().getScoreboardManager().getNewScoreboard();
+        return this.plugin.getServer().getScoreboardManager().getNewScoreboard();
     }
 }

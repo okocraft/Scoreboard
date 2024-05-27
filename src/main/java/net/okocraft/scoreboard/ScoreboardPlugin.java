@@ -61,19 +61,19 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        playerListener = new PlayerListener(this);
-        playerListener.register();
+        this.playerListener = new PlayerListener(this);
+        this.playerListener.register();
 
-        pluginListener = new PluginListener(this);
-        pluginListener.register();
+        this.pluginListener = new PluginListener(this);
+        this.pluginListener.register();
 
-        displayManager = new BukkitDisplayManager(this);
+        this.displayManager = new BukkitDisplayManager(this);
 
-        if (PlaceholderAPIHooker.checkEnabled(getServer())) {
-            printPlaceholderIsAvailable();
+        if (PlaceholderAPIHooker.checkEnabled(this.getServer())) {
+            this.printPlaceholderIsAvailable();
         }
 
-        var command = getCommand("sboard");
+        var command = this.getCommand("sboard");
 
         if (command != null) {
             var impl = new ScoreboardCommand(this);
@@ -84,16 +84,16 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (playerListener != null) {
-            playerListener.unregister();
+        if (this.playerListener != null) {
+            this.playerListener.unregister();
         }
 
-        if (displayManager != null) {
-            displayManager.hideAllBoards();
+        if (this.displayManager != null) {
+            this.displayManager.hideAllBoards();
         }
 
-        if (pluginListener != null) {
-            pluginListener.unregister();
+        if (this.pluginListener != null) {
+            this.pluginListener.unregister();
         }
 
         this.getServer().getAsyncScheduler().cancelTasks(this);
@@ -103,7 +103,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         try {
             this.loadConfig();
         } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not load config.yml", e);
+            this.getLogger().log(Level.SEVERE, "Could not load config.yml", e);
             exceptionConsumer.accept(e);
             return false;
         }
@@ -111,7 +111,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         try {
             this.loadMessages();
         } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not load languages", e);
+            this.getLogger().log(Level.SEVERE, "Could not load languages", e);
             exceptionConsumer.accept(e);
             return false;
         }
@@ -119,7 +119,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         try {
             this.boardManager.reload();
         } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not load boards", e);
+            this.getLogger().log(Level.SEVERE, "Could not load boards", e);
             exceptionConsumer.accept(e);
             return false;
         }
@@ -141,19 +141,19 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @NotNull
     public BoardManager getBoardManager() {
-        return boardManager;
+        return this.boardManager;
     }
 
     public DisplayManager getDisplayManager() {
-        if (displayManager == null) {
+        if (this.displayManager == null) {
             throw new IllegalStateException();
         }
 
-        return displayManager;
+        return this.displayManager;
     }
 
     public void printPlaceholderIsAvailable() {
-        getLogger().info("PlaceholderAPI is available!");
+        this.getLogger().info("PlaceholderAPI is available!");
     }
 
     public Path saveResource(String filename) throws IOException {

@@ -26,11 +26,11 @@ public class ReloadCommand extends AbstractCommand {
     public void onCommand(@NotNull CommandSender sender, @NotNull String[] args, @NotNull MiniMessageSource msgSrc) {
         this.plugin.getDisplayManager().hideAllBoards();
 
-        if (plugin.reloadSettings(ex -> Messages.RELOAD_ERROR.apply(ex).source(msgSrc).send(sender))) {
-            plugin.getServer().getAsyncScheduler().runNow(
+        if (this.plugin.reloadSettings(ex -> Messages.RELOAD_ERROR.apply(ex).source(msgSrc).send(sender))) {
+            this.plugin.getServer().getAsyncScheduler().runNow(
                     this.plugin,
                     ignored ->
-                            plugin.getServer().getOnlinePlayers()
+                            this.plugin.getServer().getOnlinePlayers()
                                     .stream()
                                     .filter(player -> player.hasPermission("scoreboard.show-on-join"))
                                     .forEach(this.plugin.getDisplayManager()::showDefaultBoard)

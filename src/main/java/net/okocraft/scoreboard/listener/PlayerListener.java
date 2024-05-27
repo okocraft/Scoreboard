@@ -18,7 +18,7 @@ public class PlayerListener implements Listener {
     }
 
     public void register() {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
     }
 
     public void unregister() {
@@ -30,12 +30,12 @@ public class PlayerListener implements Listener {
         var player = event.getPlayer();
 
         if (player.hasPermission("scoreboard.show-on-join")) {
-            plugin.getServer().getAsyncScheduler().runNow(this.plugin, ignored -> plugin.getDisplayManager().showDefaultBoard(event.getPlayer()));
+            this.plugin.getServer().getAsyncScheduler().runNow(this.plugin, ignored -> this.plugin.getDisplayManager().showDefaultBoard(event.getPlayer()));
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(@NotNull PlayerQuitEvent event) {
-        plugin.getDisplayManager().hideBoard(event.getPlayer());
+        this.plugin.getDisplayManager().hideBoard(event.getPlayer());
     }
 }

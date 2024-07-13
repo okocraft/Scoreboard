@@ -20,4 +20,5 @@ public interface BoardDisplay {
     void applyTitle();
 
     void applyLine(@NotNull LineDisplay line);
+
 }

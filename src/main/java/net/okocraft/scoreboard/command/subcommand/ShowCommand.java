@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.command.AbstractCommand;
 import net.okocraft.scoreboard.config.BoardManager;
-import net.okocraft.scoreboard.display.manager.DisplayManager;
+import net.okocraft.scoreboard.display.manager.BoardDisplayManager;
 import net.okocraft.scoreboard.message.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -24,9 +24,9 @@ public class ShowCommand extends AbstractCommand {
     private static final String SHOW_PERMISSION_OTHER = SHOW_PERMISSION + ".other";
 
     private final BoardManager boardManager;
-    private final DisplayManager displayManager;
+    private final BoardDisplayManager displayManager;
 
-    public ShowCommand(@NotNull BoardManager boardManager, @NotNull DisplayManager displayManager) {
+    public ShowCommand(@NotNull BoardManager boardManager, @NotNull BoardDisplayManager displayManager) {
         super("show", SHOW_PERMISSION, Set.of("s"));
         this.boardManager = boardManager;
         this.displayManager = displayManager;

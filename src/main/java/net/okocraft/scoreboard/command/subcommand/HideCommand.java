@@ -3,7 +3,7 @@ package net.okocraft.scoreboard.command.subcommand;
 import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.kyori.adventure.text.Component;
 import net.okocraft.scoreboard.command.AbstractCommand;
-import net.okocraft.scoreboard.display.manager.DisplayManager;
+import net.okocraft.scoreboard.display.manager.BoardDisplayManager;
 import net.okocraft.scoreboard.message.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -20,9 +20,9 @@ public class HideCommand extends AbstractCommand {
     private static final String HIDE_PERMISSION = "scoreboard.command.hide";
     private static final String HIDE_PERMISSION_OTHER = HIDE_PERMISSION + ".other";
 
-    private final DisplayManager displayManager;
+    private final BoardDisplayManager displayManager;
 
-    public HideCommand(@NotNull DisplayManager displayManager) {
+    public HideCommand(@NotNull BoardDisplayManager displayManager) {
         super("hide", HIDE_PERMISSION, Set.of("h"));
         this.displayManager = displayManager;
     }

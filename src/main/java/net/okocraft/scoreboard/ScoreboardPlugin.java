@@ -10,16 +10,16 @@ import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.okocraft.scoreboard.board.line.LineFormat;
 import net.okocraft.scoreboard.command.ScoreboardCommand;
 import net.okocraft.scoreboard.config.BoardManager;
+import net.okocraft.scoreboard.display.board.BoardDisplayProvider;
+import net.okocraft.scoreboard.display.board.BukkitBoardDisplay;
 import net.okocraft.scoreboard.display.line.LineDisplay;
-import net.okocraft.scoreboard.display.manager.BukkitDisplayManager;
-import net.okocraft.scoreboard.display.manager.DisplayManager;
+import net.okocraft.scoreboard.display.manager.BoardDisplayManager;
 import net.okocraft.scoreboard.display.placeholder.Placeholder;
 import net.okocraft.scoreboard.display.placeholder.PlaceholderProvider;
 import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
 import net.okocraft.scoreboard.message.Messages;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,33 +29,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class ScoreboardPlugin extends JavaPlugin {
 
-    private static ScoreboardPlugin INSTANCE;
-
-    public static @NotNull Plugin getPlugin() {
-        return Objects.requireNonNull(INSTANCE);
-    }
-
-    private final PlaceholderProvider placeholderProvider = new PlaceholderProvider(PlaceholderAPIHooker::createPlaceholder);
-    private final LineFormat.Compiler lineCompiler = LineFormat.compiler(this.placeholderProvider);
+    private final PlaceholderProvider placeholderProvider;
+    private final LineFormat.Compiler lineCompiler;
+    private final BoardDisplayProvider displayProvider;
     private final BoardManager boardManager = new BoardManager(this);
 
     private MiniMessageLocalization localization;
-    private DisplayManager displayManager;
+    private BoardDisplayManager displayManager;
     private PlayerListener playerListener;
     private PluginListener pluginListener;
 
+    public ScoreboardPlugin() {
+        this.placeholderProvider = new PlaceholderProvider(PlaceholderAPIHooker::createPlaceholder);
+        this.displayProvider = BukkitBoardDisplay.createProvider(this);
+        this.lineCompiler = LineFormat.compiler(this.placeholderProvider);
+        Placeholder.registerDefaults(this.placeholderProvider);
+    }
+
+    public ScoreboardPlugin(@NotNull BoardDisplayProvider displayProvider) {
+        this.placeholderProvider = new PlaceholderProvider(PlaceholderAPIHooker::createPlaceholder);
+        this.displayProvider = displayProvider;
+        this.lineCompiler = LineFormat.compiler(this.placeholderProvider);
+    }
+
     @Override
     public void onLoad() {
-        INSTANCE = this;
-
-        Placeholder.registerDefaults(this.placeholderProvider);
-
         this.reloadSettings(ex -> {});
     }
 
@@ -67,7 +70,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         this.pluginListener = new PluginListener(this);
         this.pluginListener.register();
 
-        this.displayManager = new BukkitDisplayManager(this);
+        this.displayManager = new BoardDisplayManager(this.boardManager, this.displayProvider);
 
         if (PlaceholderAPIHooker.checkEnabled(this.getServer())) {
             this.printPlaceholderIsAvailable();
@@ -144,7 +147,7 @@ public class ScoreboardPlugin extends JavaPlugin {
         return this.boardManager;
     }
 
-    public DisplayManager getDisplayManager() {
+    public BoardDisplayManager getDisplayManager() {
         if (this.displayManager == null) {
             throw new IllegalStateException();
         }

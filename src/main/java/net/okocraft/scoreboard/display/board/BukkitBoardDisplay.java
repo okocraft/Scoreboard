@@ -6,6 +6,7 @@ import io.papermc.paper.util.Tick;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
 import net.okocraft.scoreboard.display.line.LineDisplay;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -17,9 +18,27 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class BukkitBoardDisplay implements BoardDisplay {
+
+    public static @NotNull BoardDisplayProvider createProvider(@NotNull ScoreboardPlugin plugin) {
+        return (player, board) -> {
+            Scoreboard scoreboard;
+
+            if (Bukkit.isPrimaryThread()) {
+                scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+            } else {
+                scoreboard = CompletableFuture.supplyAsync(
+                        () -> Bukkit.getScoreboardManager().getNewScoreboard(),
+                        plugin.getServer().getScheduler().getMainThreadExecutor(plugin)
+                ).join();
+            }
+
+            return new BukkitBoardDisplay(plugin, board, player, scoreboard);
+        };
+    }
 
     private static final int MAX_LINES = 16;
 

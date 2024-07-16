@@ -74,8 +74,8 @@ public class LineDisplay {
 
     private @NotNull TextComponent processLine(int index) {
         return LengthChecker.check(
-                this.line.lines().get(index).render(new Placeholder.Context(this.player)),
-                this.line.lengthLimit(globalLengthLimit)
+            this.line.lines().get(index).render(new Placeholder.Context(this.player)),
+            this.line.lengthLimit(globalLengthLimit)
         );
     }
 }

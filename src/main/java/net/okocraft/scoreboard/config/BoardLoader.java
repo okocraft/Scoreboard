@@ -53,19 +53,19 @@ final class BoardLoader {
 
         try (var listStream = Files.list(dirPath)) {
             return listStream
-                    .filter(Files::isRegularFile)
-                    .filter(Files::isReadable)
-                    .filter(p -> checkFilename(p.getFileName().toString()))
-                    .map(filepath -> {
-                        try {
-                            return createBoardFromNode(plugin.getLineCompiler(), getBoardName(filepath), YamlFormat.DEFAULT.load(filepath));
-                        } catch (IOException e) {
-                            plugin.getLogger().log(Level.SEVERE, "Could not load " + filepath.getFileName(), e);
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                .filter(Files::isRegularFile)
+                .filter(Files::isReadable)
+                .filter(p -> checkFilename(p.getFileName().toString()))
+                .map(filepath -> {
+                    try {
+                        return createBoardFromNode(plugin.getLineCompiler(), getBoardName(filepath), YamlFormat.DEFAULT.load(filepath));
+                    } catch (IOException e) {
+                        plugin.getLogger().log(Level.SEVERE, "Could not load " + filepath.getFileName(), e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not load board files", e);
             return Collections.emptyList();
@@ -79,10 +79,10 @@ final class BoardLoader {
 
         if (node.getOrDefault(LEGACY_PATH_LINE, node.get(PATH_LINES)) instanceof MapNode linesSection) {
             lines = linesSection.value().values().stream()
-                    .filter(MapNode.class::isInstance)
-                    .map(MapNode.class::cast)
-                    .map(mapNode -> createLine(compiler, mapNode))
-                    .toList();
+                .filter(MapNode.class::isInstance)
+                .map(MapNode.class::cast)
+                .map(mapNode -> createLine(compiler, mapNode))
+                .toList();
         } else {
             lines = Collections.emptyList();
         }

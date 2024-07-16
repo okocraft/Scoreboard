@@ -59,12 +59,12 @@ final class LineFormatCompiler implements LineFormat.Compiler {
                     var placeholder = this.provider.get(rawPlaceholder);
 
                     consumer.accept(
-                            placeholder != null ?
-                                    placeholder :
-                                    Placeholder.string(
-                                            textBuilder.insert(0, PLACEHOLDER_BRACKET)
-                                                    .append(PLACEHOLDER_BRACKET).toString()
-                                    )
+                        placeholder != null ?
+                            placeholder :
+                            Placeholder.string(
+                                textBuilder.insert(0, PLACEHOLDER_BRACKET)
+                                    .append(PLACEHOLDER_BRACKET).toString()
+                            )
                     );
 
                     textBuilder.setLength(0);

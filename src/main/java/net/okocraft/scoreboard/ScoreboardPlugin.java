@@ -59,7 +59,8 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        this.reloadSettings(ex -> {});
+        this.reloadSettings(ex -> {
+        });
     }
 
     @Override
@@ -186,9 +187,9 @@ public class ScoreboardPlugin extends JavaPlugin {
         }
 
         DirectorySource.propertiesFiles(this.getDataFolder().toPath().resolve("languages"))
-                .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
-                .messageProcessor(MessageProcessors.appendMissingMessagesToPropertiesFile(this::loadDefaultMessageMap))
-                .load(loaded -> this.localization.addSource(loaded.locale(), MiniMessageSource.create(loaded.messageSource())));
+            .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
+            .messageProcessor(MessageProcessors.appendMissingMessagesToPropertiesFile(this::loadDefaultMessageMap))
+            .load(loaded -> this.localization.addSource(loaded.locale(), MiniMessageSource.create(loaded.messageSource())));
     }
 
     private @Nullable Map<String, String> loadDefaultMessageMap(@NotNull Locale locale) throws IOException {

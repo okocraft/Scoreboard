@@ -33,7 +33,8 @@ public class LineFormat {
     }
 
     public interface Compiler {
-        @NotNull LineFormat compile(@NotNull Component format);
+        @NotNull
+        LineFormat compile(@NotNull Component format);
     }
 
     record StyleInheritingPlaceholder(@NotNull Placeholder placeholder, @NotNull Style style) {

@@ -19,28 +19,33 @@ public interface Command {
      *
      * @return the command name
      */
-    @NotNull String getName();
+    @NotNull
+    String getName();
 
     /**
      * Gets the permission node.
      *
      * @return the permission node
      */
-    @NotNull String getPermissionNode();
+    @NotNull
+    String getPermissionNode();
 
     /**
      * Gets the set of aliases.
      *
      * @return the set of aliases
      */
-    @NotNull @Unmodifiable Set<String> getAliases();
+    @NotNull
+    @Unmodifiable
+    Set<String> getAliases();
 
     /**
      * Gets the helps.
      *
      * @return the helps
      */
-    @NotNull Component getHelp(@NotNull MiniMessageSource msgSrc);
+    @NotNull
+    Component getHelp(@NotNull MiniMessageSource msgSrc);
 
     /**
      * Executes the command.
@@ -63,5 +68,6 @@ public interface Command {
      * @param args   the array of arguments
      * @return the result of the tab-completion or an empty list
      */
-    @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args);
+    @NotNull
+    List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args);
 }

@@ -31,9 +31,9 @@ public class ScoreboardCommand implements CommandExecutor, TabCompleter {
     public ScoreboardCommand(@NotNull ScoreboardPlugin plugin) {
         this.localization = plugin.getLocalization();
         this.subCommandHolder = new SubCommandHolder(
-                new ShowCommand(plugin.getBoardManager(), plugin.getDisplayManager()),
-                new HideCommand(plugin.getDisplayManager()),
-                new ReloadCommand(plugin)
+            new ShowCommand(plugin.getBoardManager(), plugin.getDisplayManager()),
+            new HideCommand(plugin.getDisplayManager()),
+            new ReloadCommand(plugin)
         );
     }
 
@@ -81,23 +81,23 @@ public class ScoreboardCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             return this.subCommandHolder.getSubCommands().stream()
-                    .filter(cmd -> sender.hasPermission(cmd.getPermissionNode()))
-                    .map(net.okocraft.scoreboard.command.Command::getName)
-                    .filter(cmdName -> cmdName.startsWith(args[0].toLowerCase(Locale.ROOT)))
-                    .toList();
+                .filter(cmd -> sender.hasPermission(cmd.getPermissionNode()))
+                .map(net.okocraft.scoreboard.command.Command::getName)
+                .filter(cmdName -> cmdName.startsWith(args[0].toLowerCase(Locale.ROOT)))
+                .toList();
         }
 
         return this.subCommandHolder.search(args[0])
-                .filter(cmd -> sender.hasPermission(cmd.getPermissionNode()))
-                .map(cmd -> cmd.onTabComplete(sender, args))
-                .orElse(Collections.emptyList());
+            .filter(cmd -> sender.hasPermission(cmd.getPermissionNode()))
+            .map(cmd -> cmd.onTabComplete(sender, args))
+            .orElse(Collections.emptyList());
     }
 
     private void sendHelp(@NotNull CommandSender sender, @NotNull MiniMessageSource msgSrc) {
         Messages.COMMAND_HELP_HEADER.source(msgSrc).send(sender);
         sender.sendMessage(Component.join(
-                JoinConfiguration.newlines(),
-                ((Iterable<Component>) this.subCommandHolder.getSubCommands().stream().map(cmd -> cmd.getHelp(msgSrc))::iterator)
+            JoinConfiguration.newlines(),
+            ((Iterable<Component>) this.subCommandHolder.getSubCommands().stream().map(cmd -> cmd.getHelp(msgSrc))::iterator)
         ));
     }
 }

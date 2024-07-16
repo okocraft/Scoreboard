@@ -38,7 +38,8 @@ public interface Placeholder {
         return Long.toString(bytes >> 20); // bytes / 1024 / 1024 (MB)
     }
 
-    @NotNull Component apply(@NotNull Context context);
+    @NotNull
+    Component apply(@NotNull Context context);
 
     record Context(@NotNull Player viewer, int blockX, int blockY, int blockZ) {
 

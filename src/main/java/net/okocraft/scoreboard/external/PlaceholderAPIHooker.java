@@ -32,9 +32,9 @@ public final class PlaceholderAPIHooker {
     public static Placeholder createPlaceholder(String placeholder) {
         var cachedPlaceholder = '%' + placeholder + '%';
         return context -> Component.text(
-                enabled ?
-                        renderPlaceholder(context, cachedPlaceholder) :
-                        cachedPlaceholder
+            enabled ?
+                renderPlaceholder(context, cachedPlaceholder) :
+                cachedPlaceholder
         );
     }
 

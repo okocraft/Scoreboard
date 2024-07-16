@@ -28,12 +28,12 @@ public class ReloadCommand extends AbstractCommand {
 
         if (this.plugin.reloadSettings(ex -> Messages.RELOAD_ERROR.apply(ex).source(msgSrc).send(sender))) {
             this.plugin.getServer().getAsyncScheduler().runNow(
-                    this.plugin,
-                    ignored ->
-                            this.plugin.getServer().getOnlinePlayers()
-                                    .stream()
-                                    .filter(player -> player.hasPermission("scoreboard.show-on-join"))
-                                    .forEach(this.plugin.getDisplayManager()::showDefaultBoard)
+                this.plugin,
+                ignored ->
+                    this.plugin.getServer().getOnlinePlayers()
+                        .stream()
+                        .filter(player -> player.hasPermission("scoreboard.show-on-join"))
+                        .forEach(this.plugin.getDisplayManager()::showDefaultBoard)
             );
 
             Messages.RELOAD_FINISH.source(msgSrc).send(sender);

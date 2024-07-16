@@ -31,8 +31,8 @@ public class BukkitBoardDisplay implements BoardDisplay {
                 scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
             } else {
                 scoreboard = CompletableFuture.supplyAsync(
-                        () -> Bukkit.getScoreboardManager().getNewScoreboard(),
-                        plugin.getServer().getScheduler().getMainThreadExecutor(plugin)
+                    () -> Bukkit.getScoreboardManager().getNewScoreboard(),
+                    plugin.getServer().getScheduler().getMainThreadExecutor(plugin)
                 ).join();
             }
 

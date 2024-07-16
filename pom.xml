@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.github.siroshun09.configapi</groupId>
             <artifactId>configapi-format-yaml</artifactId>
-            <version>5.0.0-beta.3</version>
+            <version>5.0.0-SNAPSHOT</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>

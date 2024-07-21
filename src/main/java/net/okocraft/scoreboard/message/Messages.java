@@ -49,7 +49,7 @@ public final class Messages {
     public static final MiniMessageBase HIDE_HELP = help(def("scoreboard.hide.commandline", "/sb hide {player}"), def("scoreboard.hide.help", "Hides the board"));
     public static final MiniMessageBase HIDE_ALREADY = messageKey(def("scoreboard.hide.already", "<red>The board is already hidden."));
     public static final MiniMessageBase HIDE_SELF = messageKey(def("scoreboard.hide.self", "<gray>The board is now hidden."));
-    public static final Arg1<Player> HIDE_OTHER = arg1(def("scoreboard.hide.other", "<gray>Player <aqua><player><aqua>'s board is now hidden."), PLAYER);
+    public static final Arg1<Player> HIDE_OTHER = arg1(def("scoreboard.hide.other", "<gray>Player <aqua><player><gray>'s board is now hidden."), PLAYER);
 
     public static final MiniMessageBase RELOAD_HELP = help(def("scoreboard.reload.commandline", "/sb reload"), def("scoreboard.reload.help", "Reloads configurations."));
     public static final Arg1<Throwable> RELOAD_ERROR = arg1(def("scoreboard.reload.error", "<red>An error occurred while reloading configurations: <white><error>"), ERROR);

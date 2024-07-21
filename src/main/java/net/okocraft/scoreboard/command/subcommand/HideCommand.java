@@ -79,7 +79,10 @@ public class HideCommand extends AbstractCommand {
 
         if (args.length == 2 && sender.hasPermission(HIDE_PERMISSION_OTHER)) {
             var filter = args[1].toLowerCase(Locale.ENGLISH);
-            return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.startsWith(filter)).toList();
+            return Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .filter(name -> name.toLowerCase(Locale.ENGLISH).startsWith(filter))
+                .toList();
         }
 
         return Collections.emptyList();

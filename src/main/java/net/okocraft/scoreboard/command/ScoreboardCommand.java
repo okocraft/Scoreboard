@@ -10,18 +10,15 @@ import net.okocraft.scoreboard.command.subcommand.ReloadCommand;
 import net.okocraft.scoreboard.command.subcommand.ShowCommand;
 import net.okocraft.scoreboard.message.Messages;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class ScoreboardCommand implements CommandExecutor, TabCompleter {
+public class ScoreboardCommand extends Command {
 
     private static final String COMMAND_PERMISSION = "scoreboard.command";
 
@@ -29,6 +26,7 @@ public class ScoreboardCommand implements CommandExecutor, TabCompleter {
     private final SubCommandHolder subCommandHolder;
 
     public ScoreboardCommand(@NotNull ScoreboardPlugin plugin) {
+        super("sboard", "The command for Scoreboard plugin", "", List.of("sb"));
         this.localization = plugin.getLocalization();
         this.subCommandHolder = new SubCommandHolder(
             new ShowCommand(plugin.getBoardManager(), plugin.getDisplayManager()),
@@ -38,8 +36,7 @@ public class ScoreboardCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-                             @NotNull String label, @NotNull String[] args) {
+    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         var msgSrc = this.localization.findSource(sender);
 
         if (!(sender.hasPermission(COMMAND_PERMISSION))) {
@@ -71,7 +68,7 @@ public class ScoreboardCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command c, @NotNull String s, @NotNull String[] args) {
+    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(args);
 

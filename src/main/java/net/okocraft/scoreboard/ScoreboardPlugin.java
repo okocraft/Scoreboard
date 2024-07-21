@@ -20,6 +20,7 @@ import net.okocraft.scoreboard.external.PlaceholderAPIHooker;
 import net.okocraft.scoreboard.listener.PlayerListener;
 import net.okocraft.scoreboard.listener.PluginListener;
 import net.okocraft.scoreboard.message.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,13 +78,7 @@ public class ScoreboardPlugin extends JavaPlugin {
             this.printPlaceholderIsAvailable();
         }
 
-        var command = this.getCommand("sboard");
-
-        if (command != null) {
-            var impl = new ScoreboardCommand(this);
-            command.setExecutor(impl);
-            command.setTabCompleter(impl);
-        }
+        Bukkit.getCommandMap().register("sboard", new ScoreboardCommand(this));
     }
 
     @Override

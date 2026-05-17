@@ -9,7 +9,7 @@ import java.util.Collections;
 
 public final class LengthChecker {
 
-    public static @NotNull TextComponent check(@NotNull TextComponent component, int lengthLimit) {
+    public static @NotNull Component check(@NotNull TextComponent component, int lengthLimit) {
         if (lengthLimit < 1) {
             return Component.empty();
         }
@@ -50,7 +50,7 @@ public final class LengthChecker {
             }
         }
 
-        return builder.build();
+        return builder.asComponent();
     }
 
     private static @NotNull TextComponent removeChildren(@NotNull TextComponent component) {

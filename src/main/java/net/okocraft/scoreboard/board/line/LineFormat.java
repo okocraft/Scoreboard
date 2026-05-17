@@ -29,7 +29,7 @@ public class LineFormat {
             this.placeholders.get(i).appendRendered(builder, context);
         }
 
-        return builder.build();
+        return (TextComponent) builder.asComponent();
     }
 
     public interface Compiler {

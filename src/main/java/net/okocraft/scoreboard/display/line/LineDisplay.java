@@ -1,7 +1,6 @@
 package net.okocraft.scoreboard.display.line;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.okocraft.scoreboard.board.line.Line;
 import net.okocraft.scoreboard.display.placeholder.Placeholder;
 import net.okocraft.scoreboard.util.LengthChecker;
@@ -17,8 +16,8 @@ public class LineDisplay {
     private final int num;
     private final String name;
 
-    private TextComponent prevLine;
-    private TextComponent currentLine;
+    private Component prevLine;
+    private Component currentLine;
 
     private int currentIndex = 0;
 
@@ -43,7 +42,7 @@ public class LineDisplay {
         return this.num;
     }
 
-    public @NotNull TextComponent getCurrentLine() {
+    public @NotNull Component getCurrentLine() {
         return this.currentLine;
     }
 
@@ -72,7 +71,7 @@ public class LineDisplay {
         return this.line.interval();
     }
 
-    private @NotNull TextComponent processLine(int index) {
+    private @NotNull Component processLine(int index) {
         return LengthChecker.check(
             this.line.lines().get(index).render(new Placeholder.Context(this.player)),
             this.line.lengthLimit(globalLengthLimit)

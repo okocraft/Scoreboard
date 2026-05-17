@@ -1,6 +1,5 @@
 package net.okocraft.scoreboard.command.subcommand;
 
-import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.kyori.adventure.text.Component;
 import net.okocraft.scoreboard.command.AbstractCommand;
 import net.okocraft.scoreboard.display.manager.BoardDisplayManager;
@@ -28,31 +27,31 @@ public class HideCommand extends AbstractCommand {
     }
 
     @Override
-    public @NotNull Component getHelp(@NotNull MiniMessageSource msgSrc) {
-        return Messages.HIDE_HELP.create(msgSrc);
+    public @NotNull Component getHelp() {
+        return Messages.HIDE_HELP;
     }
 
     @Override
-    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args, @NotNull MiniMessageSource msgSrc) {
+    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
         Player target;
 
         if (1 < args.length) {
             if (!sender.hasPermission(HIDE_PERMISSION_OTHER)) {
-                Messages.NO_PERMISSION.apply(HIDE_PERMISSION_OTHER).source(msgSrc).send(sender);
+                sender.sendMessage(Messages.NO_PERMISSION.apply(HIDE_PERMISSION_OTHER));
                 return;
             }
 
             target = Bukkit.getPlayer(args[1]);
 
             if (target == null) {
-                Messages.PLAYER_NOT_FOUND.apply(args[1]).source(msgSrc).send(sender);
+                sender.sendMessage(Messages.PLAYER_NOT_FOUND.apply(args[1]));
                 return;
             }
         } else {
             if (sender instanceof Player player) {
                 target = player;
             } else {
-                Messages.ONLY_PLAYER.source(msgSrc).send(sender);
+                sender.sendMessage(Messages.ONLY_PLAYER);
                 return;
             }
         }
@@ -60,14 +59,14 @@ public class HideCommand extends AbstractCommand {
         if (this.displayManager.isDisplayed(target)) {
             this.displayManager.hideBoard(target);
         } else {
-            Messages.HIDE_ALREADY.source(msgSrc).send(sender);
+            sender.sendMessage(Messages.HIDE_ALREADY);
             return;
         }
 
         if (sender.equals(target)) {
-            Messages.HIDE_SELF.source(msgSrc).send(sender);
+            sender.sendMessage(Messages.HIDE_SELF);
         } else {
-            Messages.HIDE_OTHER.apply(target).source(msgSrc).send(sender);
+            sender.sendMessage(Messages.HIDE_OTHER.apply(target));
         }
     }
 

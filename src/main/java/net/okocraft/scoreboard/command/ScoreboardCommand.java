@@ -1,7 +1,5 @@
 package net.okocraft.scoreboard.command;
 
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
-import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.okocraft.scoreboard.ScoreboardPlugin;
@@ -22,12 +20,10 @@ public class ScoreboardCommand extends Command {
 
     private static final String COMMAND_PERMISSION = "scoreboard.command";
 
-    private final MiniMessageLocalization localization;
     private final SubCommandHolder subCommandHolder;
 
     public ScoreboardCommand(@NotNull ScoreboardPlugin plugin) {
         super("sboard", "The command for Scoreboard plugin", "", List.of("sb"));
-        this.localization = plugin.getLocalization();
         this.subCommandHolder = new SubCommandHolder(
             new ShowCommand(plugin.getBoardManager(), plugin.getDisplayManager()),
             new HideCommand(plugin.getDisplayManager()),
@@ -37,31 +33,29 @@ public class ScoreboardCommand extends Command {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        var msgSrc = this.localization.findSource(sender);
-
         if (!(sender.hasPermission(COMMAND_PERMISSION))) {
-            Messages.NO_PERMISSION.apply(COMMAND_PERMISSION).source(msgSrc).send(sender);
+            sender.sendMessage(Messages.NO_PERMISSION.apply(COMMAND_PERMISSION));
             return true;
         }
 
         if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-            this.sendHelp(sender, msgSrc);
+            this.sendHelp(sender);
             return true;
         }
 
         var optionalSubCommand = this.subCommandHolder.search(args[0]);
 
         if (optionalSubCommand.isEmpty()) {
-            this.sendHelp(sender, msgSrc);
+            this.sendHelp(sender);
             return true;
         }
 
         var subCommand = optionalSubCommand.get();
 
         if (sender.hasPermission(subCommand.getPermissionNode())) {
-            subCommand.onCommand(sender, args, msgSrc);
+            subCommand.onCommand(sender, args);
         } else {
-            Messages.NO_PERMISSION.apply(subCommand.getPermissionNode()).source(msgSrc).send(sender);
+            sender.sendMessage(Messages.NO_PERMISSION.apply(subCommand.getPermissionNode()));
         }
 
         return true;
@@ -90,11 +84,11 @@ public class ScoreboardCommand extends Command {
             .orElse(Collections.emptyList());
     }
 
-    private void sendHelp(@NotNull CommandSender sender, @NotNull MiniMessageSource msgSrc) {
-        Messages.COMMAND_HELP_HEADER.source(msgSrc).send(sender);
+    private void sendHelp(@NotNull CommandSender sender) {
+        sender.sendMessage(Messages.COMMAND_HELP_HEADER);
         sender.sendMessage(Component.join(
             JoinConfiguration.newlines(),
-            ((Iterable<Component>) this.subCommandHolder.getSubCommands().stream().map(cmd -> cmd.getHelp(msgSrc))::iterator)
+            ((Iterable<Component>) this.subCommandHolder.getSubCommands().stream().map(net.okocraft.scoreboard.command.Command::getHelp)::iterator)
         ));
     }
 }

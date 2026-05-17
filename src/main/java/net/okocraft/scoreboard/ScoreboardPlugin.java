@@ -1,12 +1,12 @@
 package net.okocraft.scoreboard;
 
 import com.github.siroshun09.configapi.format.yaml.YamlFormat;
-import com.github.siroshun09.messages.api.directory.DirectorySource;
-import com.github.siroshun09.messages.api.directory.MessageProcessors;
-import com.github.siroshun09.messages.api.source.StringMessageMap;
-import com.github.siroshun09.messages.api.util.PropertiesFile;
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
-import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
+import dev.siroshun.mcmsgdef.directory.DirectorySource;
+import dev.siroshun.mcmsgdef.directory.MessageProcessors;
+import dev.siroshun.mcmsgdef.file.PropertiesFile;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.Translator;
 import net.okocraft.scoreboard.board.line.LineFormat;
 import net.okocraft.scoreboard.command.ScoreboardCommand;
 import net.okocraft.scoreboard.config.BoardManager;
@@ -40,7 +40,6 @@ public class ScoreboardPlugin extends JavaPlugin {
     private final BoardDisplayProvider displayProvider;
     private final BoardManager boardManager = new BoardManager(this);
 
-    private MiniMessageLocalization localization;
     private BoardDisplayManager displayManager;
     private PlayerListener playerListener;
     private PluginListener pluginListener;
@@ -134,10 +133,6 @@ public class ScoreboardPlugin extends JavaPlugin {
         return this.lineCompiler;
     }
 
-    public @NotNull MiniMessageLocalization getLocalization() {
-        return this.localization;
-    }
-
     @NotNull
     public BoardManager getBoardManager() {
         return this.boardManager;
@@ -175,16 +170,17 @@ public class ScoreboardPlugin extends JavaPlugin {
     }
 
     private void loadMessages() throws IOException {
-        if (this.localization == null) { // on startup
-            this.localization = new MiniMessageLocalization(MiniMessageSource.create(StringMessageMap.create(Messages.defaultMessages())), Messages::getLocaleFrom);
-        } else { // on reload
-            this.localization.clearSources();
+        Key languageKey = Key.key("scoreboard", "language");
+        for (Translator source : GlobalTranslator.translator().sources()) {
+            if (source.name().equals(languageKey)) {
+                GlobalTranslator.translator().removeSource(source);
+            }
         }
 
         DirectorySource.propertiesFiles(this.getDataFolder().toPath().resolve("languages"))
             .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
             .messageProcessor(MessageProcessors.appendMissingMessagesToPropertiesFile(this::loadDefaultMessageMap))
-            .load(loaded -> this.localization.addSource(loaded.locale(), MiniMessageSource.create(loaded.messageSource())));
+            .loadAndRegister(languageKey);
     }
 
     private @Nullable Map<String, String> loadDefaultMessageMap(@NotNull Locale locale) throws IOException {

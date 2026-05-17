@@ -49,9 +49,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.siroshun09.messages</groupId>
-            <artifactId>messages-minimessage</artifactId>
-            <version>0.8.0</version>
+            <groupId>dev.siroshun.mcmsgdef</groupId>
+            <artifactId>mcmsgdef</artifactId>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

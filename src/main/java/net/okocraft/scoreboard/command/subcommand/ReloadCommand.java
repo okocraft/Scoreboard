@@ -1,6 +1,5 @@
 package net.okocraft.scoreboard.command.subcommand;
 
-import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.kyori.adventure.text.Component;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.command.AbstractCommand;
@@ -18,15 +17,15 @@ public class ReloadCommand extends AbstractCommand {
     }
 
     @Override
-    public @NotNull Component getHelp(@NotNull MiniMessageSource msgSrc) {
-        return Messages.RELOAD_HELP.create(msgSrc);
+    public @NotNull Component getHelp() {
+        return Messages.RELOAD_HELP;
     }
 
     @Override
-    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args, @NotNull MiniMessageSource msgSrc) {
+    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
         this.plugin.getDisplayManager().hideAllBoards();
 
-        if (this.plugin.reloadSettings(ex -> Messages.RELOAD_ERROR.apply(ex).source(msgSrc).send(sender))) {
+        if (this.plugin.reloadSettings(ex -> sender.sendMessage(Messages.RELOAD_ERROR.apply(ex)))) {
             this.plugin.getServer().getAsyncScheduler().runNow(
                 this.plugin,
                 ignored ->
@@ -36,7 +35,7 @@ public class ReloadCommand extends AbstractCommand {
                         .forEach(this.plugin.getDisplayManager()::showDefaultBoard)
             );
 
-            Messages.RELOAD_FINISH.source(msgSrc).send(sender);
+            sender.sendMessage(Messages.RELOAD_FINISH);
         }
     }
 }

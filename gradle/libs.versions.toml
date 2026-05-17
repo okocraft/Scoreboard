@@ -1,0 +1,19 @@
+[versions]
+
+configapi = "5.0.0-beta.3"
+paper = "26.1.2.build.64-stable"
+placeholder-api = "2.12.2"
+mcmsgdef = "1.2.0"
+gradle-plugins = "1.8.4"
+
+[libraries]
+
+configapi-format-yaml = { module = "com.github.siroshun09.configapi:configapi-format-yaml", version.ref = "configapi" }
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+placeholder-api = { module = "me.clip:placeholderapi", version.ref = "placeholder-api" }
+mcmsgdef = { module = "dev.siroshun.mcmsgdef:mcmsgdef", version.ref = "mcmsgdef" }
+
+[plugins]
+
+jcommon = { id = "dev.siroshun.gradle.plugins.jcommon", version.ref = "gradle-plugins" }
+bundler = { id = "dev.siroshun.gradle.plugins.bundler", version.ref = "gradle-plugins" }

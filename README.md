@@ -9,7 +9,7 @@
 ## Requirements
 
 - Java 25+
-- Paper 1.20.4+
+- Paper 1.21+
 - (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 
 ## Usage

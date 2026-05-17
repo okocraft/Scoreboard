@@ -1,0 +1,9 @@
+name: Scoreboard
+version: "${projectVersion}"
+main: net.okocraft.scoreboard.ScoreboardPlugin
+api-version: "1.21"
+
+dependencies:
+  server:
+    PlaceholderAPI:
+      required: false

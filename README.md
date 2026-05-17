@@ -1,7 +1,7 @@
 # Scoreboard
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/okocraft/Scoreboard)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/okocraft/Scoreboard/maven.yml?branch=master)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/okocraft/Scoreboard/gradle.yml?branch=master)
 ![GitHub](https://img.shields.io/github/license/okocraft/Scoreboard)
 
 ゲーム画面の右側にカスタマイズしたスコアボードを表示する Paper プラグインです。

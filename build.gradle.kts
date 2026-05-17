@@ -9,6 +9,7 @@ jcommon {
 
     setupPaperRepository()
     commonRepositories {
+        mavenCentral()
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     }
 

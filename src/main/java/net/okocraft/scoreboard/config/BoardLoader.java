@@ -1,7 +1,5 @@
 package net.okocraft.scoreboard.config;
 
-import com.github.siroshun09.configapi.core.node.MapNode;
-import com.github.siroshun09.configapi.format.yaml.YamlFormat;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.okocraft.scoreboard.ScoreboardPlugin;
 import net.okocraft.scoreboard.board.Board;
@@ -22,20 +20,13 @@ import java.util.stream.Collectors;
 
 final class BoardLoader {
 
-    private static final String PATH_TITLE = "title";
-    private static final String LEGACY_PATH_LINE = "line";
-    private static final String PATH_LINES = "lines";
-    private static final String PATH_LIST = "list";
-    private static final String PATH_INTERVAL = "interval";
-    private static final String PATH_LENGTH_LIMIT = "length-limit";
-
     private BoardLoader() {
         throw new UnsupportedOperationException();
     }
 
     static @NotNull Board loadDefaultBoard(@NotNull ScoreboardPlugin plugin) throws IOException {
-        var filepath = plugin.saveResource("default.yml");
-        return createBoardFromNode(plugin.getLineCompiler(), getBoardName(filepath), YamlFormat.DEFAULT.load(filepath));
+        BoardConfig config = loadBoardConfig(plugin.saveResource("default.yml"));
+        return createBoardFromConfig(config, plugin.getLineCompiler());
     }
 
     static @NotNull @Unmodifiable List<Board> loadCustomBoards(@NotNull ScoreboardPlugin plugin) {
@@ -58,13 +49,14 @@ final class BoardLoader {
                 .filter(p -> checkFilename(p.getFileName().toString()))
                 .map(filepath -> {
                     try {
-                        return createBoardFromNode(plugin.getLineCompiler(), getBoardName(filepath), YamlFormat.DEFAULT.load(filepath));
+                        return loadBoardConfig(filepath);
                     } catch (IOException e) {
                         plugin.getLogger().log(Level.SEVERE, "Could not load " + filepath.getFileName(), e);
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
+                .map(config -> createBoardFromConfig(config, plugin.getLineCompiler()))
                 .collect(Collectors.toList());
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not load board files", e);
@@ -72,22 +64,10 @@ final class BoardLoader {
         }
     }
 
-    private static @NotNull Board createBoardFromNode(@NotNull LineFormat.Compiler compiler, @NotNull String name, @NotNull MapNode node) {
-        Line title = createLine(compiler, node.getMap(PATH_TITLE));
-
-        List<Line> lines;
-
-        if (node.getOrDefault(LEGACY_PATH_LINE, node.get(PATH_LINES)) instanceof MapNode linesSection) {
-            lines = linesSection.value().values().stream()
-                .filter(MapNode.class::isInstance)
-                .map(MapNode.class::cast)
-                .map(mapNode -> createLine(compiler, mapNode))
-                .toList();
-        } else {
-            lines = Collections.emptyList();
-        }
-
-        return new Board(name, title, lines);
+    private static @NotNull BoardConfig loadBoardConfig(@NotNull Path filepath) throws IOException {
+        BoardConfig config = BoardConfig.loadFrom(filepath);
+        config.name = getBoardName(filepath);
+        return config;
     }
 
     private static boolean checkFilename(String filename) {
@@ -105,12 +85,23 @@ final class BoardLoader {
         return name.substring(0, name.lastIndexOf('.'));
     }
 
-    private static @NotNull Line createLine(@NotNull LineFormat.Compiler compiler, @NotNull MapNode source) {
-        List<LineFormat> lineList = source.getList(PATH_LIST).asList(String.class).stream().map(LegacyComponentSerializer.legacyAmpersand()::deserialize).map(compiler::compile).toList();
-        if (lineList.isEmpty()) {
+    private static @NotNull Board createBoardFromConfig(@NotNull BoardConfig config, @NotNull LineFormat.Compiler compiler) {
+        return new Board(
+            config.name,
+            createLineFromSection(config.title, compiler),
+            config.lines.values().stream().map(section -> createLineFromSection(section, compiler)).toList()
+        );
+    }
+
+    private static @NotNull Line createLineFromSection(@NotNull BoardConfig.LineSection section, @NotNull LineFormat.Compiler compiler) {
+        if (section.list.isEmpty()) {
             return Line.EMPTY;
         } else {
-            return new Line(lineList, source.getLong(PATH_INTERVAL), source.getInteger(PATH_LENGTH_LIMIT, -1));
+            return new Line(
+                section.list.stream().map(LegacyComponentSerializer.legacyAmpersand()::deserialize).map(compiler::compile).toList(),
+                section.interval,
+                section.lengthLimit
+            );
         }
     }
 }

@@ -1,6 +1,5 @@
 package net.okocraft.scoreboard;
 
-import com.github.siroshun09.configapi.format.yaml.YamlFormat;
 import dev.siroshun.mcmsgdef.directory.DirectorySource;
 import dev.siroshun.mcmsgdef.directory.MessageProcessors;
 import dev.siroshun.mcmsgdef.file.PropertiesFile;
@@ -10,6 +9,7 @@ import net.kyori.adventure.translation.Translator;
 import net.okocraft.scoreboard.board.line.LineFormat;
 import net.okocraft.scoreboard.command.ScoreboardCommand;
 import net.okocraft.scoreboard.config.BoardManager;
+import net.okocraft.scoreboard.config.Config;
 import net.okocraft.scoreboard.display.board.BoardDisplayProvider;
 import net.okocraft.scoreboard.display.board.BukkitBoardDisplay;
 import net.okocraft.scoreboard.display.line.LineDisplay;
@@ -99,7 +99,8 @@ public class ScoreboardPlugin extends JavaPlugin {
 
     public boolean reloadSettings(@NotNull Consumer<Throwable> exceptionConsumer) {
         try {
-            this.loadConfig();
+            Config config = Config.loadFrom(this.saveResource("config.yml"));
+            LineDisplay.globalLengthLimit = Math.max(config.maxLineLength, 1);
         } catch (IOException e) {
             this.getLogger().log(Level.SEVERE, "Could not load config.yml", e);
             exceptionConsumer.accept(e);
@@ -162,11 +163,6 @@ public class ScoreboardPlugin extends JavaPlugin {
             }
         }
         return filepath;
-    }
-
-    private void loadConfig() throws IOException {
-        var config = YamlFormat.DEFAULT.load(this.saveResource("config.yml"));
-        LineDisplay.globalLengthLimit = Math.max(config.getInteger("max-line-length", 32), 1);
     }
 
     private void loadMessages() throws IOException {

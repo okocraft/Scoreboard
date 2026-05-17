@@ -13,11 +13,9 @@ jcommon {
     }
 
     commonDependencies {
+        compileOnly(libs.configurate.yaml)
         compileOnly(libs.paper.api)
         compileOnly(libs.placeholder.api)
-        implementation(libs.configapi.format.yaml) {
-            exclude("org.yaml", "snakeyaml")
-        }
         implementation(libs.mcmsgdef)
     }
 }

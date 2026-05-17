@@ -20,7 +20,10 @@ public final class LengthChecker {
             return component;
         }
 
-        var builder = removeChildren(component).toBuilder(); // Remove the children from the root component.
+        var builder = Component.text().content(component.content()); // Remove the children from the root component.
+        if (component.hasStyling()) {
+            builder.style(component.style());
+        }
         int totalLength = component.content().length();
 
         for (var element : component.iterable(ComponentIteratorType.DEPTH_FIRST)) {

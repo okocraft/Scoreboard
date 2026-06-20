@@ -175,6 +175,7 @@ public class ScoreboardPlugin extends JavaPlugin {
 
         DirectorySource.propertiesFiles(this.getDataFolder().toPath().resolve("languages"))
             .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
+            .primaryLocale(Locale.ENGLISH)
             .messageProcessor(MessageProcessors.appendMissingMessagesToPropertiesFile(this::loadDefaultMessageMap))
             .loadAndRegister(languageKey);
     }

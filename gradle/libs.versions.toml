@@ -3,7 +3,7 @@
 configurate = "4.2.0"
 paper = "26.1.2.build.69-stable"
 placeholder-api = "2.12.2"
-mcmsgdef = "1.2.0"
+mcmsgdef = "1.3.0"
 gradle-plugins = "1.8.4"
 
 [libraries]

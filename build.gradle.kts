@@ -10,7 +10,7 @@ jcommon {
     setupPaperRepository()
     commonRepositories {
         mavenCentral()
-        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+        maven("https://repo.extendedclip.com/releases/")
     }
 
     commonDependencies {
